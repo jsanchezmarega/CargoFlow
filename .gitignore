@@ -1,0 +1,22 @@
+# Build output
+bin/
+obj/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+
+# Rider / ReSharper
+.idea/
+_ReSharper*/
+*.DotSettings.user
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local configuration / secrets
+appsettings.json
+appsettings.Development.json
+.env

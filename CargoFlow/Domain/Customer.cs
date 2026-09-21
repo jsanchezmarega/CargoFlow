@@ -1,0 +1,16 @@
+﻿namespace CargoFlow.Domain;
+
+class Customer
+{
+    private Customer()
+    {
+    }
+
+    public Customer(string name)
+    {
+        this.Name = name;
+    }
+    public int Id { get; private set; }
+    public string Name { get; set; }
+    public List<Shipment> Shipments { get; private set; } = new();
+}
