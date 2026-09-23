@@ -4,7 +4,7 @@ using CargoFlow.Domain;
 
 namespace CargoFlow.Data;
 
-class CargoFlowDbContext : DbContext
+public class CargoFlowDbContext : DbContext
 {
     public DbSet<Shipment> Shipments { get; set; }
     public DbSet<Customer> Customers{ get; set; }

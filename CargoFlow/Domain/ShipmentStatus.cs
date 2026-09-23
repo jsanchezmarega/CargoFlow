@@ -1,6 +1,6 @@
 ﻿namespace CargoFlow.Domain;
 
-enum ShipmentStatus
+public enum ShipmentStatus
 {
     Planned,
     InTransit,

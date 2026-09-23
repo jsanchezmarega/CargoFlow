@@ -1,6 +1,6 @@
 ﻿namespace CargoFlow.Domain;
 
-class Customer
+public class Customer
 {
     private Customer()
     {

@@ -4,10 +4,10 @@ using CargoFlow.Data;
 using CargoFlow.Domain;
 using Microsoft.EntityFrameworkCore;
 
-class ShipmentService
+public class ShipmentService
 {
-    private CargoFlowDbContext _dbContext;
-    private INotificationService _notificationService;
+    private readonly CargoFlowDbContext _dbContext;
+    private readonly INotificationService _notificationService;
 
     public ShipmentService(CargoFlowDbContext dbContext, INotificationService notificationService)
     {
@@ -15,21 +15,47 @@ class ShipmentService
         this._notificationService = notificationService;
     }
 
-    public void SetInTransit(Shipment shipment)
+    public async Task<Shipment> CreateShipmentAsync(string customerName, string originCity,  string destinationCity, decimal weight)
+    {
+        Shipment shipment = new Shipment(
+            new Customer(customerName),
+            new Address("Germany", originCity),
+            new Address("Germany", destinationCity),
+            weight
+            );
+
+        _dbContext.Shipments.Add( shipment );
+        await _dbContext.SaveChangesAsync();
+
+        return shipment;
+    }
+
+    public async Task<List<Shipment>> GetShipmentsAsync()
+    {
+        return await _dbContext.Shipments.Include(s => s.Customer).ToListAsync();
+    }
+
+    public async Task SetInTransitAsync(Shipment shipment)
     {
         shipment.StartTransit();
+        await _dbContext.SaveChangesAsync();
+
         this._notificationService.NotifyShipment(shipment);
     }
 
-    public async Task<List<Shipment>> GetPlannedShipmentsAsync()
+    public async Task SetDeliveredAsync(Shipment shipment)
     {
-            var shipments = await this._dbContext
-            .Shipments
-            .Include(s => s.Customer)
-            .Where(s => s.Status == ShipmentStatus.Planned)
-            .OrderByDescending(s => s.Weight)
-            .ToListAsync();
+        shipment.MarkAsDelivered();
+        await _dbContext.SaveChangesAsync();
 
-        return shipments;
+        this._notificationService.NotifyShipment(shipment);
+    }
+
+    public async Task SetCancelledAsync(Shipment shipment)
+    {
+        shipment.Cancel();
+        await _dbContext.SaveChangesAsync();
+
+        this._notificationService.NotifyShipment(shipment);
     }
 }

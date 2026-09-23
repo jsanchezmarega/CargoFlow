@@ -2,7 +2,7 @@
 
 using CargoFlow.Domain;
 
-class ConsoleNotificationService : INotificationService
+public class ConsoleNotificationService : INotificationService
 {
     public void NotifyShipment(Shipment? shipment)
     {

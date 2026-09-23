@@ -2,7 +2,7 @@
 
 using CargoFlow.Domain;
 
-interface INotificationService
+public interface INotificationService
 {
     void NotifyShipment(Shipment? shipment);
 }

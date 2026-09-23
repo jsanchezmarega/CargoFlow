@@ -1,6 +1,8 @@
-﻿namespace CargoFlow.Domain;
+﻿using System.ComponentModel;
 
-class Shipment
+namespace CargoFlow.Domain;
+
+public class Shipment : INotifyPropertyChanged
 {
     private Shipment()
     {
@@ -14,18 +16,40 @@ class Shipment
         this.Weight = weight;
     }
     public int Id { get; private set; }
-    public Customer Customer { get; set; }
+    public Customer Customer { get; set; } = null!;
     public int CustomerId { get; private set; }
     public Address Origin { get; set; }
     public Address Destination { get; set; }
     public decimal Weight { get; set; }
-    public ShipmentStatus Status { get; private set; } = ShipmentStatus.Planned;
+    private ShipmentStatus status = ShipmentStatus.Planned;
+    public ShipmentStatus Status
+    {
+        get
+        {
+            return status;
+        }
+
+        private set
+        {
+            if (status == value)
+                return;
+
+            status = value;
+
+            PropertyChanged?.Invoke(
+                this,
+                new PropertyChangedEventArgs(nameof(Status))
+            );
+        }
+    }
+
+    public event PropertyChangedEventHandler? PropertyChanged;
 
     public void StartTransit()
     {
         if (this.Status != ShipmentStatus.Planned)
         {
-            throw new Exception($"Cannot transition from {this.Status} to {ShipmentStatus.InTransit}");
+            throw new InvalidShipmentStateException($"Cannot transition from {this.Status} to {ShipmentStatus.InTransit}");
         }
 
         this.Status = ShipmentStatus.InTransit;
@@ -34,7 +58,7 @@ class Shipment
     {
         if (this.Status != ShipmentStatus.InTransit)
         {
-            throw new Exception($"Cannot transition from {this.Status} to {ShipmentStatus.Delivered}");
+            throw new InvalidShipmentStateException($"Cannot transition from {this.Status} to {ShipmentStatus.Delivered}");
         }
 
         this.Status = ShipmentStatus.Delivered;
@@ -43,7 +67,7 @@ class Shipment
     {
         if (this.Status == ShipmentStatus.Delivered || this.Status == ShipmentStatus.Cancelled)
         {
-            throw new Exception($"Cannot transition from {this.Status} to {ShipmentStatus.Cancelled}");
+            throw new InvalidShipmentStateException($"Cannot transition from {this.Status} to {ShipmentStatus.Cancelled}");
         }
 
         this.Status = ShipmentStatus.Cancelled;
