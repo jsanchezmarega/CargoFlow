@@ -19,6 +19,7 @@ static class Program
 
         services.AddDbContext<CargoFlowDbContext>();
         services.AddTransient<ShipmentService>();
+        services.AddTransient<CustomerService>();
         services.AddTransient<INotificationService, ConsoleNotificationService>();
         services.AddTransient<Form1>();
 

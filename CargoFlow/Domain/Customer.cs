@@ -11,6 +11,6 @@ public class Customer
         this.Name = name;
     }
     public int Id { get; private set; }
-    public string Name { get; set; }
+    public string Name { get; set; } = null!;
     public List<Shipment> Shipments { get; private set; } = new();
 }

@@ -34,39 +34,42 @@ partial class Form1
         originLabel = new Label();
         destinationLabel = new Label();
         weightLabel = new Label();
-        customerTextBox = new TextBox();
         originTextBox = new TextBox();
         destinationTextBox = new TextBox();
         weightTextBox = new TextBox();
         dataGridView1 = new DataGridView();
-        idColumn = new DataGridViewTextBoxColumn();
-        customerColumn = new DataGridViewTextBoxColumn();
-        originColumn = new DataGridViewTextBoxColumn();
-        destinationColumn = new DataGridViewTextBoxColumn();
-        weightColumn = new DataGridViewTextBoxColumn();
-        statusColumn = new DataGridViewTextBoxColumn();
         bindingSource1 = new BindingSource(components);
         startTransitButton = new Button();
         markAsDeliveredButton = new Button();
         cancelShipmentButton = new Button();
+        createCustomerButton = new Button();
+        customerNameLabel = new Label();
+        customerNameTextBox = new TextBox();
+        customerComboBox = new ComboBox();
+        customerColumn = new DataGridViewTextBoxColumn();
+        idColumn = new DataGridViewTextBoxColumn();
+        originColumn = new DataGridViewTextBoxColumn();
+        destinationColumn = new DataGridViewTextBoxColumn();
+        weightColumn = new DataGridViewTextBoxColumn();
+        statusColumn = new DataGridViewTextBoxColumn();
         ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
         ((System.ComponentModel.ISupportInitialize)bindingSource1).BeginInit();
         SuspendLayout();
         // 
         // createButton
         // 
-        createButton.Location = new Point(153, 215);
+        createButton.Location = new Point(132, 403);
         createButton.Name = "createButton";
-        createButton.Size = new Size(75, 23);
+        createButton.Size = new Size(132, 23);
         createButton.TabIndex = 0;
-        createButton.Text = "Create";
+        createButton.Text = "Create shipment";
         createButton.UseVisualStyleBackColor = true;
         createButton.Click += CreateButton_Click;
         // 
         // customerLabel
         // 
         customerLabel.AutoSize = true;
-        customerLabel.Location = new Point(71, 73);
+        customerLabel.Location = new Point(67, 250);
         customerLabel.Name = "customerLabel";
         customerLabel.Size = new Size(62, 15);
         customerLabel.TabIndex = 1;
@@ -75,7 +78,7 @@ partial class Form1
         // originLabel
         // 
         originLabel.AutoSize = true;
-        originLabel.Location = new Point(90, 107);
+        originLabel.Location = new Point(86, 284);
         originLabel.Name = "originLabel";
         originLabel.Size = new Size(43, 15);
         originLabel.TabIndex = 3;
@@ -84,7 +87,7 @@ partial class Form1
         // destinationLabel
         // 
         destinationLabel.AutoSize = true;
-        destinationLabel.Location = new Point(61, 144);
+        destinationLabel.Location = new Point(57, 321);
         destinationLabel.Name = "destinationLabel";
         destinationLabel.Size = new Size(70, 15);
         destinationLabel.TabIndex = 5;
@@ -93,36 +96,29 @@ partial class Form1
         // weightLabel
         // 
         weightLabel.AutoSize = true;
-        weightLabel.Location = new Point(61, 179);
+        weightLabel.Location = new Point(57, 356);
         weightLabel.Name = "weightLabel";
         weightLabel.Size = new Size(72, 15);
         weightLabel.TabIndex = 9;
         weightLabel.Text = "Weight (kg):";
         // 
-        // customerTextBox
-        // 
-        customerTextBox.Location = new Point(153, 70);
-        customerTextBox.Name = "customerTextBox";
-        customerTextBox.Size = new Size(100, 23);
-        customerTextBox.TabIndex = 2;
-        // 
         // originTextBox
         // 
-        originTextBox.Location = new Point(153, 104);
+        originTextBox.Location = new Point(149, 281);
         originTextBox.Name = "originTextBox";
         originTextBox.Size = new Size(100, 23);
         originTextBox.TabIndex = 4;
         // 
         // destinationTextBox
         // 
-        destinationTextBox.Location = new Point(153, 141);
+        destinationTextBox.Location = new Point(149, 318);
         destinationTextBox.Name = "destinationTextBox";
         destinationTextBox.Size = new Size(100, 23);
         destinationTextBox.TabIndex = 8;
         // 
         // weightTextBox
         // 
-        weightTextBox.Location = new Point(153, 176);
+        weightTextBox.Location = new Point(149, 353);
         weightTextBox.Name = "weightTextBox";
         weightTextBox.Size = new Size(100, 23);
         weightTextBox.TabIndex = 10;
@@ -140,6 +136,70 @@ partial class Form1
         dataGridView1.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
         dataGridView1.Size = new Size(605, 239);
         dataGridView1.TabIndex = 11;
+        // 
+        // startTransitButton
+        // 
+        startTransitButton.Location = new Point(476, 348);
+        startTransitButton.Name = "startTransitButton";
+        startTransitButton.Size = new Size(75, 23);
+        startTransitButton.TabIndex = 13;
+        startTransitButton.Text = "Start transit";
+        startTransitButton.UseVisualStyleBackColor = true;
+        startTransitButton.Click += startTransitButton_Click;
+        // 
+        // markAsDeliveredButton
+        // 
+        markAsDeliveredButton.Location = new Point(584, 348);
+        markAsDeliveredButton.Name = "markAsDeliveredButton";
+        markAsDeliveredButton.Size = new Size(117, 23);
+        markAsDeliveredButton.TabIndex = 14;
+        markAsDeliveredButton.Text = "Mark as delivered";
+        markAsDeliveredButton.UseVisualStyleBackColor = true;
+        markAsDeliveredButton.Click += markAsDeliveredButton_Click;
+        // 
+        // cancelShipmentButton
+        // 
+        cancelShipmentButton.Location = new Point(729, 348);
+        cancelShipmentButton.Name = "cancelShipmentButton";
+        cancelShipmentButton.Size = new Size(115, 23);
+        cancelShipmentButton.TabIndex = 15;
+        cancelShipmentButton.Text = "Cancel shipment";
+        cancelShipmentButton.UseVisualStyleBackColor = true;
+        cancelShipmentButton.Click += cancelShipmentButton_Click;
+        // 
+        // createCustomerButton
+        // 
+        createCustomerButton.Location = new Point(164, 129);
+        createCustomerButton.Name = "createCustomerButton";
+        createCustomerButton.Size = new Size(107, 23);
+        createCustomerButton.TabIndex = 16;
+        createCustomerButton.Text = "Create customer";
+        createCustomerButton.UseVisualStyleBackColor = true;
+        createCustomerButton.Click += createCustomerButton_Click;
+        // 
+        // customerNameLabel
+        // 
+        customerNameLabel.AutoSize = true;
+        customerNameLabel.Location = new Point(51, 92);
+        customerNameLabel.Name = "customerNameLabel";
+        customerNameLabel.Size = new Size(95, 15);
+        customerNameLabel.TabIndex = 17;
+        customerNameLabel.Text = "Customer name:";
+        // 
+        // customerNameTextBox
+        // 
+        customerNameTextBox.Location = new Point(164, 89);
+        customerNameTextBox.Name = "customerNameTextBox";
+        customerNameTextBox.Size = new Size(100, 23);
+        customerNameTextBox.TabIndex = 18;
+        // 
+        // customerComboBox
+        // 
+        customerComboBox.FormattingEnabled = true;
+        customerComboBox.Location = new Point(150, 242);
+        customerComboBox.Name = "customerComboBox";
+        customerComboBox.Size = new Size(121, 23);
+        customerComboBox.TabIndex = 19;
         // 
         // idColumn
         // 
@@ -177,41 +237,15 @@ partial class Form1
         statusColumn.HeaderText = "Status";
         statusColumn.Name = "statusColumn";
         // 
-        // startTransitButton
-        // 
-        startTransitButton.Location = new Point(476, 348);
-        startTransitButton.Name = "startTransitButton";
-        startTransitButton.Size = new Size(75, 23);
-        startTransitButton.TabIndex = 13;
-        startTransitButton.Text = "Start transit";
-        startTransitButton.UseVisualStyleBackColor = true;
-        startTransitButton.Click += startTransitButton_Click;
-        // 
-        // markAsDeliveredButton
-        // 
-        markAsDeliveredButton.Location = new Point(584, 348);
-        markAsDeliveredButton.Name = "markAsDeliveredButton";
-        markAsDeliveredButton.Size = new Size(117, 23);
-        markAsDeliveredButton.TabIndex = 14;
-        markAsDeliveredButton.Text = "Mark as delivered";
-        markAsDeliveredButton.UseVisualStyleBackColor = true;
-        markAsDeliveredButton.Click += markAsDeliveredButton_Click;
-        // 
-        // cancelShipmentButton
-        // 
-        cancelShipmentButton.Location = new Point(729, 348);
-        cancelShipmentButton.Name = "cancelShipmentButton";
-        cancelShipmentButton.Size = new Size(115, 23);
-        cancelShipmentButton.TabIndex = 15;
-        cancelShipmentButton.Text = "Cancel shipment";
-        cancelShipmentButton.UseVisualStyleBackColor = true;
-        cancelShipmentButton.Click += cancelShipmentButton_Click;
-        // 
         // Form1
         // 
         AutoScaleDimensions = new SizeF(7F, 15F);
         AutoScaleMode = AutoScaleMode.Font;
-        ClientSize = new Size(1072, 474);
+        ClientSize = new Size(1162, 507);
+        Controls.Add(customerComboBox);
+        Controls.Add(customerNameTextBox);
+        Controls.Add(customerNameLabel);
+        Controls.Add(createCustomerButton);
         Controls.Add(cancelShipmentButton);
         Controls.Add(markAsDeliveredButton);
         Controls.Add(startTransitButton);
@@ -222,7 +256,6 @@ partial class Form1
         Controls.Add(destinationLabel);
         Controls.Add(originTextBox);
         Controls.Add(originLabel);
-        Controls.Add(customerTextBox);
         Controls.Add(customerLabel);
         Controls.Add(createButton);
         Name = "Form1";
@@ -237,7 +270,6 @@ partial class Form1
 
     private Button createButton;
     private Label customerLabel;
-    private TextBox customerTextBox;
     private TextBox originTextBox;
     private Label originLabel;
     private Label destinationLabel;
@@ -247,12 +279,16 @@ partial class Form1
     private DataGridView dataGridView1;
     private BindingSource bindingSource1;
     private Button startTransitButton;
-    private DataGridViewTextBoxColumn idColumn;
+    private Button markAsDeliveredButton;
+    private Button cancelShipmentButton;
+    private Button createCustomerButton;
+    private Label customerNameLabel;
+    private TextBox customerNameTextBox;
+    private ComboBox customerComboBox;
     private DataGridViewTextBoxColumn customerColumn;
+    private DataGridViewTextBoxColumn idColumn;
     private DataGridViewTextBoxColumn originColumn;
     private DataGridViewTextBoxColumn destinationColumn;
     private DataGridViewTextBoxColumn weightColumn;
     private DataGridViewTextBoxColumn statusColumn;
-    private Button markAsDeliveredButton;
-    private Button cancelShipmentButton;
 }

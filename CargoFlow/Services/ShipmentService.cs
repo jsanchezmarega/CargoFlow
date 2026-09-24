@@ -15,10 +15,10 @@ public class ShipmentService
         this._notificationService = notificationService;
     }
 
-    public async Task<Shipment> CreateShipmentAsync(string customerName, string originCity,  string destinationCity, decimal weight)
+    public async Task<Shipment> CreateShipmentAsync(Customer customer, string originCity,  string destinationCity, decimal weight)
     {
         Shipment shipment = new Shipment(
-            new Customer(customerName),
+            customer,
             new Address("Germany", originCity),
             new Address("Germany", destinationCity),
             weight

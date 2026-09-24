@@ -18,8 +18,8 @@ public class Shipment : INotifyPropertyChanged
     public int Id { get; private set; }
     public Customer Customer { get; set; } = null!;
     public int CustomerId { get; private set; }
-    public Address Origin { get; set; }
-    public Address Destination { get; set; }
+    public Address Origin { get; set; } = null!;
+    public Address Destination { get; set; } = null!;
     public decimal Weight { get; set; }
     private ShipmentStatus status = ShipmentStatus.Planned;
     public ShipmentStatus Status
