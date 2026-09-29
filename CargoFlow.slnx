@@ -1,4 +1,5 @@
 <Solution>
   <Project Path="CargoFlow.Desktop/CargoFlow.Desktop.csproj" />
+  <Project Path="CargoFlow.Tests/CargoFlow.Tests.csproj" />
   <Project Path="CargoFlow/CargoFlow.csproj" />
 </Solution>

@@ -9,8 +9,18 @@ public class CargoFlowDbContext : DbContext
     public DbSet<Shipment> Shipments { get; set; }
     public DbSet<Customer> Customers{ get; set; }
 
+    public CargoFlowDbContext(DbContextOptions<CargoFlowDbContext> options)
+    : base(options)
+    {
+    }
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
+        if (optionsBuilder.IsConfigured)
+        {
+            return;
+        }
+
         Env.TraversePath().Load();
 
         var host = Environment.GetEnvironmentVariable("DB_HOST")
