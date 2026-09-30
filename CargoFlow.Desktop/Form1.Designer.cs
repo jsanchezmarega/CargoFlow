@@ -28,7 +28,6 @@ partial class Form1
     /// </summary>
     private void InitializeComponent()
     {
-        components = new System.ComponentModel.Container();
         createButton = new Button();
         customerLabel = new Label();
         originLabel = new Label();
@@ -37,8 +36,6 @@ partial class Form1
         originTextBox = new TextBox();
         destinationTextBox = new TextBox();
         weightTextBox = new TextBox();
-        dataGridView1 = new DataGridView();
-        bindingSource1 = new BindingSource(components);
         startTransitButton = new Button();
         markAsDeliveredButton = new Button();
         cancelShipmentButton = new Button();
@@ -46,22 +43,30 @@ partial class Form1
         customerNameLabel = new Label();
         customerNameTextBox = new TextBox();
         customerComboBox = new ComboBox();
-        customerColumn = new DataGridViewTextBoxColumn();
-        idColumn = new DataGridViewTextBoxColumn();
-        originColumn = new DataGridViewTextBoxColumn();
-        destinationColumn = new DataGridViewTextBoxColumn();
-        weightColumn = new DataGridViewTextBoxColumn();
-        statusColumn = new DataGridViewTextBoxColumn();
-        ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
-        ((System.ComponentModel.ISupportInitialize)bindingSource1).BeginInit();
+        shipmentGridControl = new DevExpress.XtraGrid.GridControl();
+        shipmentGridView = new DevExpress.XtraGrid.Views.Grid.GridView();
+        mainTableLayoutPanel = new TableLayoutPanel();
+        shipmentsGroupBox = new GroupBox();
+        shipmentsTableLayoutPanel = new TableLayoutPanel();
+        shipmentActionsFlowLayoutPanel = new FlowLayoutPanel();
+        customersGroupBox = new GroupBox();
+        newShipmentGroupBox = new GroupBox();
+        ((System.ComponentModel.ISupportInitialize)shipmentGridControl).BeginInit();
+        ((System.ComponentModel.ISupportInitialize)shipmentGridView).BeginInit();
+        mainTableLayoutPanel.SuspendLayout();
+        shipmentsGroupBox.SuspendLayout();
+        shipmentsTableLayoutPanel.SuspendLayout();
+        shipmentActionsFlowLayoutPanel.SuspendLayout();
+        customersGroupBox.SuspendLayout();
+        newShipmentGroupBox.SuspendLayout();
         SuspendLayout();
         // 
         // createButton
         // 
-        createButton.Location = new Point(132, 403);
+        createButton.Location = new Point(6, 212);
         createButton.Name = "createButton";
         createButton.Size = new Size(132, 23);
-        createButton.TabIndex = 0;
+        createButton.TabIndex = 4;
         createButton.Text = "Create shipment";
         createButton.UseVisualStyleBackColor = true;
         createButton.Click += CreateButton_Click;
@@ -69,7 +74,7 @@ partial class Form1
         // customerLabel
         // 
         customerLabel.AutoSize = true;
-        customerLabel.Location = new Point(67, 250);
+        customerLabel.Location = new Point(6, 33);
         customerLabel.Name = "customerLabel";
         customerLabel.Size = new Size(62, 15);
         customerLabel.TabIndex = 1;
@@ -78,7 +83,7 @@ partial class Form1
         // originLabel
         // 
         originLabel.AutoSize = true;
-        originLabel.Location = new Point(86, 284);
+        originLabel.Location = new Point(6, 77);
         originLabel.Name = "originLabel";
         originLabel.Size = new Size(43, 15);
         originLabel.TabIndex = 3;
@@ -87,7 +92,7 @@ partial class Form1
         // destinationLabel
         // 
         destinationLabel.AutoSize = true;
-        destinationLabel.Location = new Point(57, 321);
+        destinationLabel.Location = new Point(6, 121);
         destinationLabel.Name = "destinationLabel";
         destinationLabel.Size = new Size(70, 15);
         destinationLabel.TabIndex = 5;
@@ -96,7 +101,7 @@ partial class Form1
         // weightLabel
         // 
         weightLabel.AutoSize = true;
-        weightLabel.Location = new Point(57, 356);
+        weightLabel.Location = new Point(6, 165);
         weightLabel.Name = "weightLabel";
         weightLabel.Size = new Size(72, 15);
         weightLabel.TabIndex = 9;
@@ -104,75 +109,61 @@ partial class Form1
         // 
         // originTextBox
         // 
-        originTextBox.Location = new Point(149, 281);
+        originTextBox.Location = new Point(6, 95);
         originTextBox.Name = "originTextBox";
-        originTextBox.Size = new Size(100, 23);
-        originTextBox.TabIndex = 4;
+        originTextBox.Size = new Size(195, 23);
+        originTextBox.TabIndex = 1;
         // 
         // destinationTextBox
         // 
-        destinationTextBox.Location = new Point(149, 318);
+        destinationTextBox.Location = new Point(6, 139);
         destinationTextBox.Name = "destinationTextBox";
-        destinationTextBox.Size = new Size(100, 23);
-        destinationTextBox.TabIndex = 8;
+        destinationTextBox.Size = new Size(195, 23);
+        destinationTextBox.TabIndex = 2;
         // 
         // weightTextBox
         // 
-        weightTextBox.Location = new Point(149, 353);
+        weightTextBox.Location = new Point(6, 183);
         weightTextBox.Name = "weightTextBox";
-        weightTextBox.Size = new Size(100, 23);
-        weightTextBox.TabIndex = 10;
-        // 
-        // dataGridView1
-        // 
-        dataGridView1.AllowUserToAddRows = false;
-        dataGridView1.AutoGenerateColumns = false;
-        dataGridView1.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-        dataGridView1.Columns.AddRange(new DataGridViewColumn[] { idColumn, customerColumn, originColumn, destinationColumn, weightColumn, statusColumn });
-        dataGridView1.DataSource = bindingSource1;
-        dataGridView1.Location = new Point(362, 70);
-        dataGridView1.Name = "dataGridView1";
-        dataGridView1.RowHeadersVisible = false;
-        dataGridView1.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-        dataGridView1.Size = new Size(605, 239);
-        dataGridView1.TabIndex = 11;
+        weightTextBox.Size = new Size(195, 23);
+        weightTextBox.TabIndex = 3;
         // 
         // startTransitButton
         // 
-        startTransitButton.Location = new Point(476, 348);
+        startTransitButton.Location = new Point(292, 3);
         startTransitButton.Name = "startTransitButton";
         startTransitButton.Size = new Size(75, 23);
-        startTransitButton.TabIndex = 13;
+        startTransitButton.TabIndex = 0;
         startTransitButton.Text = "Start transit";
         startTransitButton.UseVisualStyleBackColor = true;
         startTransitButton.Click += startTransitButton_Click;
         // 
         // markAsDeliveredButton
         // 
-        markAsDeliveredButton.Location = new Point(584, 348);
+        markAsDeliveredButton.Location = new Point(373, 3);
         markAsDeliveredButton.Name = "markAsDeliveredButton";
         markAsDeliveredButton.Size = new Size(117, 23);
-        markAsDeliveredButton.TabIndex = 14;
+        markAsDeliveredButton.TabIndex = 1;
         markAsDeliveredButton.Text = "Mark as delivered";
         markAsDeliveredButton.UseVisualStyleBackColor = true;
         markAsDeliveredButton.Click += markAsDeliveredButton_Click;
         // 
         // cancelShipmentButton
         // 
-        cancelShipmentButton.Location = new Point(729, 348);
+        cancelShipmentButton.Location = new Point(496, 3);
         cancelShipmentButton.Name = "cancelShipmentButton";
         cancelShipmentButton.Size = new Size(115, 23);
-        cancelShipmentButton.TabIndex = 15;
+        cancelShipmentButton.TabIndex = 2;
         cancelShipmentButton.Text = "Cancel shipment";
         cancelShipmentButton.UseVisualStyleBackColor = true;
         cancelShipmentButton.Click += cancelShipmentButton_Click;
         // 
         // createCustomerButton
         // 
-        createCustomerButton.Location = new Point(164, 129);
+        createCustomerButton.Location = new Point(6, 80);
         createCustomerButton.Name = "createCustomerButton";
         createCustomerButton.Size = new Size(107, 23);
-        createCustomerButton.TabIndex = 16;
+        createCustomerButton.TabIndex = 1;
         createCustomerButton.Text = "Create customer";
         createCustomerButton.UseVisualStyleBackColor = true;
         createCustomerButton.Click += createCustomerButton_Click;
@@ -180,7 +171,7 @@ partial class Form1
         // customerNameLabel
         // 
         customerNameLabel.AutoSize = true;
-        customerNameLabel.Location = new Point(51, 92);
+        customerNameLabel.Location = new Point(6, 33);
         customerNameLabel.Name = "customerNameLabel";
         customerNameLabel.Size = new Size(95, 15);
         customerNameLabel.TabIndex = 17;
@@ -188,82 +179,150 @@ partial class Form1
         // 
         // customerNameTextBox
         // 
-        customerNameTextBox.Location = new Point(164, 89);
+        customerNameTextBox.Location = new Point(6, 51);
         customerNameTextBox.Name = "customerNameTextBox";
-        customerNameTextBox.Size = new Size(100, 23);
-        customerNameTextBox.TabIndex = 18;
+        customerNameTextBox.Size = new Size(195, 23);
+        customerNameTextBox.TabIndex = 0;
         // 
         // customerComboBox
         // 
+        customerComboBox.DropDownStyle = ComboBoxStyle.DropDownList;
         customerComboBox.FormattingEnabled = true;
-        customerComboBox.Location = new Point(150, 242);
+        customerComboBox.Location = new Point(6, 51);
         customerComboBox.Name = "customerComboBox";
-        customerComboBox.Size = new Size(121, 23);
-        customerComboBox.TabIndex = 19;
+        customerComboBox.Size = new Size(195, 23);
+        customerComboBox.TabIndex = 0;
         // 
-        // idColumn
+        // shipmentGridControl
         // 
-        idColumn.DataPropertyName = "Id";
-        idColumn.HeaderText = "Id";
-        idColumn.Name = "idColumn";
+        shipmentGridControl.Dock = DockStyle.Fill;
+        shipmentGridControl.Location = new Point(3, 3);
+        shipmentGridControl.MainView = shipmentGridView;
+        shipmentGridControl.Name = "shipmentGridControl";
+        shipmentGridControl.Size = new Size(614, 502);
+        shipmentGridControl.TabIndex = 0;
+        shipmentGridControl.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] { shipmentGridView });
         // 
-        // customerColumn
+        // shipmentGridView
         // 
-        customerColumn.DataPropertyName = "Customer";
-        customerColumn.HeaderText = "Customer";
-        customerColumn.Name = "customerColumn";
+        shipmentGridView.GridControl = shipmentGridControl;
+        shipmentGridView.Name = "shipmentGridView";
+        shipmentGridView.OptionsBehavior.Editable = false;
+        shipmentGridView.OptionsSelection.MultiSelect = true;
         // 
-        // originColumn
+        // mainTableLayoutPanel
         // 
-        originColumn.DataPropertyName = "Origin";
-        originColumn.HeaderText = "Origin";
-        originColumn.Name = "originColumn";
+        mainTableLayoutPanel.ColumnCount = 3;
+        mainTableLayoutPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
+        mainTableLayoutPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
+        mainTableLayoutPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 55F));
+        mainTableLayoutPanel.Controls.Add(shipmentsGroupBox, 2, 0);
+        mainTableLayoutPanel.Controls.Add(customersGroupBox, 0, 0);
+        mainTableLayoutPanel.Controls.Add(newShipmentGroupBox, 1, 0);
+        mainTableLayoutPanel.Dock = DockStyle.Fill;
+        mainTableLayoutPanel.Location = new Point(0, 0);
+        mainTableLayoutPanel.Name = "mainTableLayoutPanel";
+        mainTableLayoutPanel.Padding = new Padding(12);
+        mainTableLayoutPanel.RowCount = 1;
+        mainTableLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+        mainTableLayoutPanel.Size = new Size(1184, 611);
+        mainTableLayoutPanel.TabIndex = 21;
         // 
-        // destinationColumn
+        // shipmentsGroupBox
         // 
-        destinationColumn.DataPropertyName = "Destination";
-        destinationColumn.HeaderText = "Destination";
-        destinationColumn.Name = "destinationColumn";
+        shipmentsGroupBox.Controls.Add(shipmentsTableLayoutPanel);
+        shipmentsGroupBox.Dock = DockStyle.Fill;
+        shipmentsGroupBox.Location = new Point(540, 18);
+        shipmentsGroupBox.Margin = new Padding(6);
+        shipmentsGroupBox.Name = "shipmentsGroupBox";
+        shipmentsGroupBox.Size = new Size(626, 575);
+        shipmentsGroupBox.TabIndex = 0;
+        shipmentsGroupBox.TabStop = false;
+        shipmentsGroupBox.Text = "Shipments";
         // 
-        // weightColumn
+        // shipmentsTableLayoutPanel
         // 
-        weightColumn.DataPropertyName = "Weight";
-        weightColumn.HeaderText = "Weight";
-        weightColumn.Name = "weightColumn";
+        shipmentsTableLayoutPanel.ColumnCount = 1;
+        shipmentsTableLayoutPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+        shipmentsTableLayoutPanel.Controls.Add(shipmentGridControl, 0, 0);
+        shipmentsTableLayoutPanel.Controls.Add(shipmentActionsFlowLayoutPanel, 0, 1);
+        shipmentsTableLayoutPanel.Dock = DockStyle.Fill;
+        shipmentsTableLayoutPanel.Location = new Point(3, 19);
+        shipmentsTableLayoutPanel.Name = "shipmentsTableLayoutPanel";
+        shipmentsTableLayoutPanel.RowCount = 2;
+        shipmentsTableLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+        shipmentsTableLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 45F));
+        shipmentsTableLayoutPanel.Size = new Size(620, 553);
+        shipmentsTableLayoutPanel.TabIndex = 21;
         // 
-        // statusColumn
+        // shipmentActionsFlowLayoutPanel
         // 
-        statusColumn.DataPropertyName = "Status";
-        statusColumn.HeaderText = "Status";
-        statusColumn.Name = "statusColumn";
+        shipmentActionsFlowLayoutPanel.Controls.Add(cancelShipmentButton);
+        shipmentActionsFlowLayoutPanel.Controls.Add(markAsDeliveredButton);
+        shipmentActionsFlowLayoutPanel.Controls.Add(startTransitButton);
+        shipmentActionsFlowLayoutPanel.Dock = DockStyle.Fill;
+        shipmentActionsFlowLayoutPanel.FlowDirection = FlowDirection.RightToLeft;
+        shipmentActionsFlowLayoutPanel.Location = new Point(3, 511);
+        shipmentActionsFlowLayoutPanel.Name = "shipmentActionsFlowLayoutPanel";
+        shipmentActionsFlowLayoutPanel.Size = new Size(614, 39);
+        shipmentActionsFlowLayoutPanel.TabIndex = 21;
+        shipmentActionsFlowLayoutPanel.WrapContents = false;
+        // 
+        // customersGroupBox
+        // 
+        customersGroupBox.Controls.Add(customerNameTextBox);
+        customersGroupBox.Controls.Add(createCustomerButton);
+        customersGroupBox.Controls.Add(customerNameLabel);
+        customersGroupBox.Dock = DockStyle.Fill;
+        customersGroupBox.Location = new Point(18, 18);
+        customersGroupBox.Margin = new Padding(6);
+        customersGroupBox.Name = "customersGroupBox";
+        customersGroupBox.Size = new Size(220, 575);
+        customersGroupBox.TabIndex = 21;
+        customersGroupBox.TabStop = false;
+        customersGroupBox.Text = "Customers";
+        // 
+        // newShipmentGroupBox
+        // 
+        newShipmentGroupBox.Controls.Add(customerComboBox);
+        newShipmentGroupBox.Controls.Add(weightTextBox);
+        newShipmentGroupBox.Controls.Add(createButton);
+        newShipmentGroupBox.Controls.Add(weightLabel);
+        newShipmentGroupBox.Controls.Add(customerLabel);
+        newShipmentGroupBox.Controls.Add(destinationTextBox);
+        newShipmentGroupBox.Controls.Add(originLabel);
+        newShipmentGroupBox.Controls.Add(destinationLabel);
+        newShipmentGroupBox.Controls.Add(originTextBox);
+        newShipmentGroupBox.Dock = DockStyle.Fill;
+        newShipmentGroupBox.Location = new Point(250, 18);
+        newShipmentGroupBox.Margin = new Padding(6);
+        newShipmentGroupBox.Name = "newShipmentGroupBox";
+        newShipmentGroupBox.Size = new Size(278, 575);
+        newShipmentGroupBox.TabIndex = 22;
+        newShipmentGroupBox.TabStop = false;
+        newShipmentGroupBox.Text = "New Shipment";
         // 
         // Form1
         // 
         AutoScaleDimensions = new SizeF(7F, 15F);
         AutoScaleMode = AutoScaleMode.Font;
-        ClientSize = new Size(1162, 507);
-        Controls.Add(customerComboBox);
-        Controls.Add(customerNameTextBox);
-        Controls.Add(customerNameLabel);
-        Controls.Add(createCustomerButton);
-        Controls.Add(cancelShipmentButton);
-        Controls.Add(markAsDeliveredButton);
-        Controls.Add(startTransitButton);
-        Controls.Add(dataGridView1);
-        Controls.Add(weightTextBox);
-        Controls.Add(weightLabel);
-        Controls.Add(destinationTextBox);
-        Controls.Add(destinationLabel);
-        Controls.Add(originTextBox);
-        Controls.Add(originLabel);
-        Controls.Add(customerLabel);
-        Controls.Add(createButton);
+        ClientSize = new Size(1184, 611);
+        Controls.Add(mainTableLayoutPanel);
+        MinimumSize = new Size(1000, 550);
         Name = "Form1";
-        Text = "Form1";
-        ((System.ComponentModel.ISupportInitialize)dataGridView1).EndInit();
-        ((System.ComponentModel.ISupportInitialize)bindingSource1).EndInit();
+        StartPosition = FormStartPosition.CenterScreen;
+        Text = "CargoFlow";
+        ((System.ComponentModel.ISupportInitialize)shipmentGridControl).EndInit();
+        ((System.ComponentModel.ISupportInitialize)shipmentGridView).EndInit();
+        mainTableLayoutPanel.ResumeLayout(false);
+        shipmentsGroupBox.ResumeLayout(false);
+        shipmentsTableLayoutPanel.ResumeLayout(false);
+        shipmentActionsFlowLayoutPanel.ResumeLayout(false);
+        customersGroupBox.ResumeLayout(false);
+        customersGroupBox.PerformLayout();
+        newShipmentGroupBox.ResumeLayout(false);
+        newShipmentGroupBox.PerformLayout();
         ResumeLayout(false);
-        PerformLayout();
     }
 
     #endregion
@@ -276,8 +335,6 @@ partial class Form1
     private TextBox destinationTextBox;
     private TextBox weightTextBox;
     private Label weightLabel;
-    private DataGridView dataGridView1;
-    private BindingSource bindingSource1;
     private Button startTransitButton;
     private Button markAsDeliveredButton;
     private Button cancelShipmentButton;
@@ -285,10 +342,12 @@ partial class Form1
     private Label customerNameLabel;
     private TextBox customerNameTextBox;
     private ComboBox customerComboBox;
-    private DataGridViewTextBoxColumn customerColumn;
-    private DataGridViewTextBoxColumn idColumn;
-    private DataGridViewTextBoxColumn originColumn;
-    private DataGridViewTextBoxColumn destinationColumn;
-    private DataGridViewTextBoxColumn weightColumn;
-    private DataGridViewTextBoxColumn statusColumn;
+    private DevExpress.XtraGrid.GridControl shipmentGridControl;
+    private DevExpress.XtraGrid.Views.Grid.GridView shipmentGridView;
+    private TableLayoutPanel mainTableLayoutPanel;
+    private GroupBox customersGroupBox;
+    private GroupBox newShipmentGroupBox;
+    private GroupBox shipmentsGroupBox;
+    private TableLayoutPanel shipmentsTableLayoutPanel;
+    private FlowLayoutPanel shipmentActionsFlowLayoutPanel;
 }

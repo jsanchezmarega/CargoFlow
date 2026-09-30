@@ -11,14 +11,18 @@ public partial class Form1 : Form
     private readonly BindingList<CustomerRow> _customerRows = new();
     private readonly ShipmentService _shipmentService;
     private readonly CustomerService _customerService;
+
     public Form1(ShipmentService shipmentService, CustomerService customerService)
     {
         InitializeComponent();
         this.Load += Form1_Load;
 
-        bindingSource1.DataSource = _shipmentRows;
+        shipmentGridControl.DataSource = _shipmentRows;
         customerComboBox.DataSource = _customerRows;
         customerComboBox.DisplayMember = "Name";
+
+        shipmentGridView.PopulateColumns();
+        shipmentGridView.Columns[nameof(ShipmentRow.Shipment)].Visible = false;
 
         this._shipmentService = shipmentService;
         this._customerService = customerService;
@@ -56,13 +60,11 @@ public partial class Form1 : Form
             return;
         }
 
-
         if (!decimal.TryParse(weightTextBox.Text, out var weight))
         {
             MessageBox.Show("Please enter a valid weight.");
             return;
         }
-
 
         var shipment = await _shipmentService.CreateShipmentAsync(
             customerRow.Customer,
@@ -80,46 +82,46 @@ public partial class Form1 : Form
 
     private async void startTransitButton_Click(object sender, EventArgs e)
     {
-        var rows = dataGridView1.SelectedRows;
-        await ChangeShipmentStatusesAsync(rows, ShipmentStatus.InTransit);
+        await ChangeShipmentStatusesAsync(ShipmentStatus.InTransit);
     }
 
     private async void markAsDeliveredButton_Click(object sender, EventArgs e)
     {
-        var rows = dataGridView1.SelectedRows;
-        await ChangeShipmentStatusesAsync(rows, ShipmentStatus.Delivered);
+        await ChangeShipmentStatusesAsync(ShipmentStatus.Delivered);
     }
 
     private async void cancelShipmentButton_Click(object sender, EventArgs e)
     {
-        var rows = dataGridView1.SelectedRows;
-        await ChangeShipmentStatusesAsync(rows, ShipmentStatus.Cancelled);
+        await ChangeShipmentStatusesAsync(ShipmentStatus.Cancelled);
     }
 
-    private async Task ChangeShipmentStatusesAsync(DataGridViewSelectedRowCollection rows, ShipmentStatus status)
+    private async Task ChangeShipmentStatusesAsync(ShipmentStatus status)
     {
+        var selectedRowHandles = shipmentGridView.GetSelectedRows();
         var failedRows = new List<Shipment>();
 
-        foreach (DataGridViewRow row in rows)
+        foreach (var rowHandle in selectedRowHandles)
         {
-            var shipmentRow = row.DataBoundItem as ShipmentRow;
+            var shipmentRow = shipmentGridView.GetRow(rowHandle) as ShipmentRow;
 
             if (shipmentRow is null)
                 continue;
 
             try
             {
-                if (status == ShipmentStatus.InTransit)
+                switch (status)
                 {
-                    await _shipmentService.SetInTransitAsync(shipmentRow.Shipment);
-                }
-                if (status == ShipmentStatus.Delivered)
-                {
-                    await _shipmentService.SetDeliveredAsync(shipmentRow.Shipment);
-                }
-                if (status == ShipmentStatus.Cancelled)
-                {
-                    await _shipmentService.SetCancelledAsync(shipmentRow.Shipment);
+                    case ShipmentStatus.InTransit:
+                        await _shipmentService.SetInTransitAsync(shipmentRow.Shipment);
+                        break;
+
+                    case ShipmentStatus.Delivered:
+                        await _shipmentService.SetDeliveredAsync(shipmentRow.Shipment);
+                        break;
+
+                    case ShipmentStatus.Cancelled:
+                        await _shipmentService.SetCancelledAsync(shipmentRow.Shipment);
+                        break;
                 }
             }
             catch (InvalidShipmentStateException)
@@ -135,7 +137,7 @@ public partial class Form1 : Form
 
         if (failedRows.Count > 0)
         {
-            MessageBox.Show($"Failed transitions in shipments: {String.Join(", ", failedRows.Select(r => "#" + r.Id))}");
+            MessageBox.Show($"Failed transitions in shipments: {string.Join(", ", failedRows.Select(r => "#" + r.Id))}");
         }
     }
 
