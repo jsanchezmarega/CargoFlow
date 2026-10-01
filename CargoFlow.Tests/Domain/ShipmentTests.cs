@@ -100,6 +100,54 @@ public class ShipmentTests
         Assert.Equal(nameof(Shipment.Status), changedProperty);
     }
 
+    [Fact]
+    public void Constructor_WhenCustomerIsNull_ShouldThrow()
+    {
+        var origin = new Address("Germany", "Cologne");
+        var destination = new Address("Germany", "Munich");
+
+        Assert.Throws<ArgumentNullException>(
+            () => new Shipment(null!, origin, destination, 500)
+        );
+    }
+
+    [Fact]
+    public void Constructor_WhenOriginIsNull_ShouldThrow()
+    {
+        var customer = new Customer("ACME GmbH");
+        var destination = new Address("Germany", "Munich");
+
+        Assert.Throws<ArgumentNullException>(
+            () => new Shipment(customer, null!, destination, 500)
+        );
+    }
+
+    [Fact]
+    public void Constructor_WhenDestinationIsNull_ShouldThrow()
+    {
+        var customer = new Customer("ACME GmbH");
+        var origin = new Address("Germany", "Cologne");
+
+        Assert.Throws<ArgumentNullException>(
+            () => new Shipment(customer, origin, null!, 500)
+        );
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(-1)]
+    [InlineData(-500)]
+    public void Constructor_WhenWeightIsNotPositive_ShouldThrow(decimal weight)
+    {
+        var customer = new Customer("ACME GmbH");
+        var origin = new Address("Germany", "Cologne");
+        var destination = new Address("Germany", "Munich");
+
+        Assert.Throws<ArgumentOutOfRangeException>(
+            () => new Shipment(customer, origin, destination, weight)
+        );
+    }
+
     private static Shipment CreateShipmentInStatus(ShipmentStatus status)
     {
         var customer = TestData.CreateCustomer();

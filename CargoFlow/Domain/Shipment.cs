@@ -8,19 +8,37 @@ public class Shipment : INotifyPropertyChanged
     {
     }
 
-    public Shipment(Customer customer, Address origin, Address destination, decimal weight)
+    public Shipment(
+        Customer customer,
+        Address origin,
+        Address destination,
+        decimal weight)
     {
-        this.Customer = customer;
-        this.Origin = origin;
-        this.Destination = destination;
-        this.Weight = weight;
+        ArgumentNullException.ThrowIfNull(customer);
+        ArgumentNullException.ThrowIfNull(origin);
+        ArgumentNullException.ThrowIfNull(destination);
+
+        if (weight <= 0)
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(weight),
+                weight,
+                "Shipment weight must be greater than zero."
+            );
+        }
+
+        Customer = customer;
+        Origin = origin;
+        Destination = destination;
+        Weight = weight;
     }
+
     public int Id { get; private set; }
-    public Customer Customer { get; set; } = null!;
+    public Customer Customer { get; private set; } = null!;
     public int CustomerId { get; private set; }
-    public Address Origin { get; set; } = null!;
-    public Address Destination { get; set; } = null!;
-    public decimal Weight { get; set; }
+    public Address Origin { get; private set; } = null!;
+    public Address Destination { get; private set; } = null!;
+    public decimal Weight { get; private set; }
     private ShipmentStatus status = ShipmentStatus.Planned;
     public ShipmentStatus Status
     {
