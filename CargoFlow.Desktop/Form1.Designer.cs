@@ -51,6 +51,12 @@ partial class Form1
         shipmentActionsFlowLayoutPanel = new FlowLayoutPanel();
         customersGroupBox = new GroupBox();
         newShipmentGroupBox = new GroupBox();
+        idColumn = new DevExpress.XtraGrid.Columns.GridColumn();
+        customerColumn = new DevExpress.XtraGrid.Columns.GridColumn();
+        originColumn = new DevExpress.XtraGrid.Columns.GridColumn();
+        destinationColumn = new DevExpress.XtraGrid.Columns.GridColumn();
+        weightColumn = new DevExpress.XtraGrid.Columns.GridColumn();
+        statusColumn = new DevExpress.XtraGrid.Columns.GridColumn();
         ((System.ComponentModel.ISupportInitialize)shipmentGridControl).BeginInit();
         ((System.ComponentModel.ISupportInitialize)shipmentGridView).BeginInit();
         mainTableLayoutPanel.SuspendLayout();
@@ -205,10 +211,14 @@ partial class Form1
         // 
         // shipmentGridView
         // 
+        shipmentGridView.Columns.AddRange(new DevExpress.XtraGrid.Columns.GridColumn[] { idColumn, customerColumn, originColumn, destinationColumn, weightColumn, statusColumn });
         shipmentGridView.GridControl = shipmentGridControl;
         shipmentGridView.Name = "shipmentGridView";
         shipmentGridView.OptionsBehavior.Editable = false;
+        shipmentGridView.OptionsFind.AlwaysVisible = true;
         shipmentGridView.OptionsSelection.MultiSelect = true;
+        shipmentGridView.OptionsView.ShowAutoFilterRow = true;
+        shipmentGridView.OptionsView.ShowFooter = true;
         // 
         // mainTableLayoutPanel
         // 
@@ -302,6 +312,54 @@ partial class Form1
         newShipmentGroupBox.TabStop = false;
         newShipmentGroupBox.Text = "New Shipment";
         // 
+        // idColumn
+        // 
+        idColumn.Caption = "ID";
+        idColumn.FieldName = "Id";
+        idColumn.Name = "idColumn";
+        idColumn.Visible = true;
+        idColumn.VisibleIndex = 0;
+        // 
+        // customerColumn
+        // 
+        customerColumn.Caption = "Customer";
+        customerColumn.FieldName = "Customer";
+        customerColumn.Name = "customerColumn";
+        customerColumn.Visible = true;
+        customerColumn.VisibleIndex = 1;
+        // 
+        // originColumn
+        // 
+        originColumn.Caption = "Origin";
+        originColumn.FieldName = "Origin";
+        originColumn.Name = "originColumn";
+        originColumn.Visible = true;
+        originColumn.VisibleIndex = 2;
+        // 
+        // destinationColumn
+        // 
+        destinationColumn.Caption = "Destination";
+        destinationColumn.FieldName = "Destination";
+        destinationColumn.Name = "destinationColumn";
+        destinationColumn.Visible = true;
+        destinationColumn.VisibleIndex = 3;
+        // 
+        // weightColumn
+        // 
+        weightColumn.Caption = "Weight";
+        weightColumn.FieldName = "Weight";
+        weightColumn.Name = "weightColumn";
+        weightColumn.Visible = true;
+        weightColumn.VisibleIndex = 4;
+        // 
+        // statusColumn
+        // 
+        statusColumn.Caption = "Status";
+        statusColumn.FieldName = "Status";
+        statusColumn.Name = "statusColumn";
+        statusColumn.Visible = true;
+        statusColumn.VisibleIndex = 5;
+        // 
         // Form1
         // 
         AutoScaleDimensions = new SizeF(7F, 15F);
@@ -350,4 +408,10 @@ partial class Form1
     private GroupBox shipmentsGroupBox;
     private TableLayoutPanel shipmentsTableLayoutPanel;
     private FlowLayoutPanel shipmentActionsFlowLayoutPanel;
+    private DevExpress.XtraGrid.Columns.GridColumn idColumn;
+    private DevExpress.XtraGrid.Columns.GridColumn customerColumn;
+    private DevExpress.XtraGrid.Columns.GridColumn originColumn;
+    private DevExpress.XtraGrid.Columns.GridColumn destinationColumn;
+    private DevExpress.XtraGrid.Columns.GridColumn weightColumn;
+    private DevExpress.XtraGrid.Columns.GridColumn statusColumn;
 }

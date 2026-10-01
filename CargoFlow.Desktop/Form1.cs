@@ -2,6 +2,7 @@ using CargoFlow.Desktop.ViewModels;
 using CargoFlow.Domain;
 using CargoFlow.Services;
 using System.ComponentModel;
+using DevExpress.Data;
 
 namespace CargoFlow.Desktop;
 
@@ -21,8 +22,20 @@ public partial class Form1 : Form
         customerComboBox.DataSource = _customerRows;
         customerComboBox.DisplayMember = "Name";
 
-        shipmentGridView.PopulateColumns();
-        shipmentGridView.Columns[nameof(ShipmentRow.Shipment)].Visible = false;
+        weightColumn.DisplayFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
+        weightColumn.DisplayFormat.FormatString = "0.## 'kg'";
+
+        idColumn.Summary.Add(
+            SummaryItemType.Count,
+            nameof(ShipmentRow.Id),
+            "Shipments: {0}"
+        );
+
+        weightColumn.Summary.Add(
+            SummaryItemType.Sum,
+            nameof(ShipmentRow.Weight),
+            "Total: {0:0.##} kg"
+        );
 
         this._shipmentService = shipmentService;
         this._customerService = customerService;
@@ -46,6 +59,8 @@ public partial class Form1 : Form
         {
             this._customerRows.Add(new CustomerRow(customer));
         }
+
+        shipmentGridView.BestFitColumns();
     }
 
     private async void CreateButton_Click(object sender, EventArgs e)
