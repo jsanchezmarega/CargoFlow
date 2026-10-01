@@ -84,6 +84,22 @@ public class ShipmentTests
         );
     }
 
+    [Fact]
+    public void StartTransit_ShouldRaiseStatusPropertyChanged()
+    {
+        var shipment = CreateShipmentInStatus(ShipmentStatus.Planned);
+        string? changedProperty = null;
+
+        shipment.PropertyChanged += (_, args) =>
+        {
+            changedProperty = args.PropertyName;
+        };
+
+        shipment.StartTransit();
+
+        Assert.Equal(nameof(Shipment.Status), changedProperty);
+    }
+
     private static Shipment CreateShipmentInStatus(ShipmentStatus status)
     {
         var customer = TestData.CreateCustomer();
