@@ -1,0 +1,16 @@
+#!/bin/sh
+
+echo "Running CargoFlow tests..."
+
+dotnet test
+status=$?
+
+if [ $status -ne 0 ]; then
+    echo
+    echo "Tests failed. Commit aborted."
+    exit $status
+fi
+
+echo
+echo "Tests passed."
+exit 0

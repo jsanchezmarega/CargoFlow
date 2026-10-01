@@ -36,7 +36,7 @@ namespace CargoFlow.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Customers");
+                    b.ToTable("Customers", (string)null);
                 });
 
             modelBuilder.Entity("CargoFlow.Domain.Shipment", b =>
@@ -86,7 +86,7 @@ namespace CargoFlow.Migrations
 
                     b.HasIndex("CustomerId");
 
-                    b.ToTable("Shipments");
+                    b.ToTable("Shipments", (string)null);
                 });
 
             modelBuilder.Entity("CargoFlow.Domain.Shipment", b =>

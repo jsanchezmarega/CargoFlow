@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using CargoFlow.Services;
 using CargoFlow.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace CargoFlow.Desktop;
 
@@ -17,7 +18,12 @@ static class Program
 
         var services = new ServiceCollection();
 
-        services.AddDbContext<CargoFlowDbContext>();
+        var connectionString = DatabaseConfiguration.GetConnectionString();
+
+        services.AddDbContext<CargoFlowDbContext>(options =>
+            options.UseSqlServer(connectionString)
+        );
+
         services.AddTransient<ShipmentService>();
         services.AddTransient<CustomerService>();
         services.AddTransient<INotificationService, ConsoleNotificationService>();

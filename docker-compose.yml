@@ -15,6 +15,16 @@ services:
       - "${DB_PORT}:1433"
     volumes:
       - cargoflow-sqlserver-data:/var/opt/mssql
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "/opt/mssql-tools18/bin/sqlcmd -S localhost -U $$DB_USER -P $$DB_PASSWORD -C -Q \"SELECT 1\" || exit 1"
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
 
 volumes:
   cargoflow-sqlserver-data:
