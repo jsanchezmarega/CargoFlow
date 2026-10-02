@@ -27,4 +27,9 @@ public class CustomerService
     {
         return await _dbContext.Customers.ToListAsync();
     }
+
+    public async Task<Customer?> GetCustomerByIdAsync(int id)
+    {
+        return await _dbContext.Customers.FindAsync(id);
+    }
 }

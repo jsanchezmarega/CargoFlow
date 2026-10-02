@@ -1,0 +1,40 @@
+@CargoFlow_Api_HostAddress = http://localhost:5266
+
+### Get shipments
+
+GET {{CargoFlow_Api_HostAddress}}/api/shipments
+Accept: application/json
+
+###
+
+### Get customers
+
+GET {{CargoFlow_Api_HostAddress}}/api/customers
+Accept: application/json
+
+###
+
+### Create customer
+
+POST {{CargoFlow_Api_HostAddress}}/api/customers
+Content-Type: application/json
+
+{
+  "name": "API Test Customer"
+}
+
+###
+
+### Get customer by ID
+
+GET {{CargoFlow_Api_HostAddress}}/api/customers/1
+Accept: application/json
+
+###
+
+### Get customer that does not exist
+
+GET {{CargoFlow_Api_HostAddress}}/api/customers/999999
+Accept: application/json
+
+###
