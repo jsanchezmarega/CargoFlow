@@ -4,11 +4,13 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var connectionString = DatabaseConfiguration.GetConnectionString();
+if (!builder.Environment.IsEnvironment("Testing"))
+{
+    var connectionString = DatabaseConfiguration.GetConnectionString();
 
-builder.Services.AddDbContext<CargoFlowDbContext>(options =>
-    options.UseSqlServer(connectionString)
-);
+    builder.Services.AddDbContext<CargoFlowDbContext>(options =>
+        options.UseSqlServer(connectionString));
+}
 
 builder.Services.AddTransient<ShipmentService>();
 builder.Services.AddTransient<CustomerService>();
@@ -29,3 +31,7 @@ app.UseHttpsRedirection();
 app.MapControllers();
 
 app.Run();
+
+public partial class Program
+{
+}

@@ -30,9 +30,37 @@ public class ShipmentService
         return shipment;
     }
 
+    public async Task<Shipment?> CreateShipmentAsync(
+        int customerId,
+        string originCity,
+        string destinationCity,
+        decimal weight)
+    {
+        var customer = await _dbContext.Customers.FindAsync(customerId);
+
+        if (customer is null)
+        {
+            return null;
+        }
+
+        return await CreateShipmentAsync(
+            customer,
+            originCity,
+            destinationCity,
+            weight
+        );
+    }
+
     public async Task<List<Shipment>> GetShipmentsAsync()
     {
         return await _dbContext.Shipments.Include(s => s.Customer).ToListAsync();
+    }
+
+    public async Task<Shipment?> GetShipmentByIdAsync(int id)
+    {
+        return await _dbContext.Shipments
+            .Include(s => s.Customer)
+            .FirstOrDefaultAsync(s => s.Id == id);
     }
 
     public async Task SetInTransitAsync(Shipment shipment)
