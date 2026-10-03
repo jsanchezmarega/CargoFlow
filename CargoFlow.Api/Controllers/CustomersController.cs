@@ -16,9 +16,11 @@ public class CustomersController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetCustomers()
+    public async Task<IActionResult> GetCustomers(
+        CancellationToken cancellationToken)
     {
-        var customers = await _customerService.GetCustomersAsync();
+        var customers = await _customerService.GetCustomersAsync(
+            cancellationToken);
 
         var response = customers.Select(customer =>
             new CustomerResponse(
@@ -31,9 +33,13 @@ public class CustomersController : ControllerBase
     }
 
     [HttpGet("{id:int}")]
-    public async Task<IActionResult> GetCustomer(int id)
+    public async Task<IActionResult> GetCustomer(
+        int id,
+        CancellationToken cancellationToken)
     {
-        var customer = await _customerService.GetCustomerByIdAsync(id);
+        var customer = await _customerService.GetCustomerByIdAsync(
+            id,
+            cancellationToken);
 
         if (customer is null)
         {
@@ -50,11 +56,12 @@ public class CustomersController : ControllerBase
 
     [HttpPost]
     public async Task<IActionResult> CreateCustomer(
-        CreateCustomerRequest request)
+        CreateCustomerRequest request,
+        CancellationToken cancellationToken)
     {
         var customer = await _customerService.CreateCustomerAsync(
-            request.Name
-        );
+            request.Name,
+            cancellationToken);
 
         var response = new CustomerResponse(
             customer.Id,

@@ -13,23 +13,32 @@ public class CustomerService
         _dbContext = dbContext;
     }
 
-    public async Task<Customer> CreateCustomerAsync(string name)
+    public async Task<Customer> CreateCustomerAsync(
+        string name,
+        CancellationToken cancellationToken = default)
     {
         Customer customer = new Customer(name);
 
         _dbContext.Customers.Add(customer);
-        await _dbContext.SaveChangesAsync();
+
+        await _dbContext.SaveChangesAsync(cancellationToken);
 
         return customer;
     }
 
-    public async Task<List<Customer>> GetCustomersAsync()
+    public async Task<List<Customer>> GetCustomersAsync(
+        CancellationToken cancellationToken = default)
     {
-        return await _dbContext.Customers.ToListAsync();
+        return await _dbContext.Customers
+            .ToListAsync(cancellationToken);
     }
 
-    public async Task<Customer?> GetCustomerByIdAsync(int id)
+    public async Task<Customer?> GetCustomerByIdAsync(
+        int id,
+        CancellationToken cancellationToken = default)
     {
-        return await _dbContext.Customers.FindAsync(id);
+        return await _dbContext.Customers.FindAsync(
+            [id],
+            cancellationToken);
     }
 }

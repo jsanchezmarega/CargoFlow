@@ -17,17 +17,22 @@ public class ShipmentsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetShipments()
+    public async Task<IActionResult> GetShipments(
+        CancellationToken cancellationToken)
     {
-        var shipments = await _shipmentService.GetShipmentsAsync();
+        var shipments = await _shipmentService.GetShipmentsAsync(
+            cancellationToken);
 
         return Ok(shipments.Select(ToResponse));
     }
-
     [HttpGet("{id:int}")]
-    public async Task<IActionResult> GetShipment(int id)
+    public async Task<IActionResult> GetShipment(
+        int id,
+        CancellationToken cancellationToken)
     {
-        var shipment = await _shipmentService.GetShipmentByIdAsync(id);
+        var shipment = await _shipmentService.GetShipmentByIdAsync(
+            id,
+            cancellationToken);
 
         if (shipment is null)
         {
@@ -39,13 +44,15 @@ public class ShipmentsController : ControllerBase
 
     [HttpPost]
     public async Task<IActionResult> CreateShipment(
-    CreateShipmentRequest request)
+        CreateShipmentRequest request,
+        CancellationToken cancellationToken)
     {
         var shipment = await _shipmentService.CreateShipmentAsync(
             request.CustomerId,
             request.OriginCity,
             request.DestinationCity,
-            request.Weight
+            request.Weight,
+            cancellationToken
         );
 
         if (shipment is null)
@@ -60,6 +67,69 @@ public class ShipmentsController : ControllerBase
             new { id = shipment.Id },
             response
         );
+    }
+    [HttpPost("{id:int}/start-transit")]
+        public async Task<ActionResult<ShipmentResponse>> StartTransit(
+        int id,
+    CancellationToken cancellationToken)
+    {
+        var shipment = await _shipmentService.GetShipmentByIdAsync(
+            id,
+            cancellationToken);
+
+
+        if (shipment is null)
+        {
+            return NotFound();
+        }
+
+        await _shipmentService.SetInTransitAsync(
+            shipment,
+            cancellationToken);
+
+        return Ok(ToResponse(shipment));
+    }
+
+    [HttpPost("{id:int}/deliver")]
+    public async Task<ActionResult<ShipmentResponse>> Deliver(
+        int id,
+        CancellationToken cancellationToken)
+    {
+        var shipment = await _shipmentService.GetShipmentByIdAsync(
+            id,
+            cancellationToken);
+
+        if (shipment is null)
+        {
+            return NotFound();
+        }
+
+        await _shipmentService.SetDeliveredAsync(
+            shipment,
+            cancellationToken);
+
+        return Ok(ToResponse(shipment));
+    }
+
+    [HttpPost("{id:int}/cancel")]
+    public async Task<ActionResult<ShipmentResponse>> Cancel(
+        int id,
+        CancellationToken cancellationToken)
+    {
+        var shipment = await _shipmentService.GetShipmentByIdAsync(
+            id,
+            cancellationToken);
+
+        if (shipment is null)
+        {
+            return NotFound();
+        }
+
+        await _shipmentService.SetCancelledAsync(
+            shipment,
+            cancellationToken);
+
+        return Ok(ToResponse(shipment));
     }
 
     private static ShipmentResponse ToResponse(Shipment shipment)

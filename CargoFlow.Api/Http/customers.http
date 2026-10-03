@@ -1,0 +1,24 @@
+@baseUrl = http://localhost:5266
+
+### Get customers
+GET {{baseUrl}}/api/customers
+Accept: application/json
+
+
+### Get customer
+GET {{baseUrl}}/api/customers/1
+Accept: application/json
+
+
+### Get nonexistent customer
+GET {{baseUrl}}/api/customers/999999
+Accept: application/json
+
+
+### Create customer
+POST {{baseUrl}}/api/customers
+Content-Type: application/json
+
+{
+  "name": "HTTP Test Customer"
+}

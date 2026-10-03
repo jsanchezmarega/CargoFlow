@@ -1,3 +1,4 @@
+using CargoFlow.Api.ExceptionHandlers;
 using CargoFlow.Data;
 using CargoFlow.Services;
 using Microsoft.EntityFrameworkCore;
@@ -16,10 +17,15 @@ builder.Services.AddTransient<ShipmentService>();
 builder.Services.AddTransient<CustomerService>();
 builder.Services.AddTransient<INotificationService, ConsoleNotificationService>();
 
+builder.Services.AddExceptionHandler<InvalidShipmentStateExceptionHandler>();
+builder.Services.AddProblemDetails();
+
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
+
+app.UseExceptionHandler();
 
 if (app.Environment.IsDevelopment())
 {

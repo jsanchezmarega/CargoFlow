@@ -6,6 +6,8 @@ if "%1"=="hooks-install" goto hooks-install
 
 if "%1"=="build" goto build
 if "%1"=="test" goto test
+if "%1"=="test-core" goto test-core
+if "%1"=="test-api" goto test-api
 if "%1"=="api" goto api
 
 if "%1"=="db-up" goto db-up
@@ -99,6 +101,16 @@ exit /b %errorlevel%
 
 :test
 dotnet test
+exit /b %errorlevel%
+
+
+:test-core
+dotnet test CargoFlow.Tests\CargoFlow.Tests.csproj
+exit /b %errorlevel%
+
+
+:test-api
+dotnet test CargoFlow.Api.Tests\CargoFlow.Api.Tests.csproj
 exit /b %errorlevel%
 
 
@@ -233,6 +245,8 @@ echo   dev.cmd hooks-install
 echo.
 echo   dev.cmd build
 echo   dev.cmd test
+echo   dev.cmd test-core
+echo   dev.cmd test-api
 echo   dev.cmd api
 echo.
 echo   dev.cmd db-up

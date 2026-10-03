@@ -35,7 +35,8 @@ public class ShipmentServiceTests
             customer,
             "Cologne",
             "Munich",
-            850
+            850,
+            TestContext.Current.CancellationToken
         );
 
         await using var verificationContext = database.CreateContext();
@@ -81,7 +82,10 @@ public class ShipmentServiceTests
             notificationService.Object
         );
 
-        var shipments = await shipmentService.GetShipmentsAsync();
+        var shipments = await shipmentService.GetShipmentsAsync(
+            TestContext.Current.CancellationToken
+        );
+
         var loadedShipment = Assert.Single(shipments);
 
         Assert.Equal(shipment.Id, loadedShipment.Id);
@@ -114,7 +118,10 @@ public class ShipmentServiceTests
             notificationService.Object
         );
 
-        await shipmentService.SetInTransitAsync(shipment);
+        await shipmentService.SetInTransitAsync(
+            shipment,
+            TestContext.Current.CancellationToken
+        );
 
         await using var verificationContext = database.CreateContext();
 
@@ -161,7 +168,10 @@ public class ShipmentServiceTests
         );
 
         await Assert.ThrowsAsync<InvalidShipmentStateException>(
-             () => shipmentService.SetInTransitAsync(shipment)
+            () => shipmentService.SetInTransitAsync(
+                shipment,
+                TestContext.Current.CancellationToken
+            )
         );
 
         notificationService.Verify(
@@ -197,7 +207,10 @@ public class ShipmentServiceTests
             notificationService.Object
         );
 
-        await shipmentService.SetDeliveredAsync(shipment);
+        await shipmentService.SetDeliveredAsync(
+            shipment,
+            TestContext.Current.CancellationToken
+        );
 
         await using var verificationContext = database.CreateContext();
 
@@ -242,7 +255,10 @@ public class ShipmentServiceTests
         );
 
         await Assert.ThrowsAsync<InvalidShipmentStateException>(
-             () => shipmentService.SetDeliveredAsync(shipment)
+            () => shipmentService.SetDeliveredAsync(
+                shipment,
+                TestContext.Current.CancellationToken
+            )
         );
 
         notificationService.Verify(
@@ -277,7 +293,10 @@ public class ShipmentServiceTests
             notificationService.Object
         );
 
-        await shipmentService.SetCancelledAsync(shipment);
+        await shipmentService.SetCancelledAsync(
+            shipment,
+            TestContext.Current.CancellationToken
+        );
 
         await using var verificationContext = database.CreateContext();
 
@@ -324,7 +343,10 @@ public class ShipmentServiceTests
         );
 
         await Assert.ThrowsAsync<InvalidShipmentStateException>(
-             () => shipmentService.SetCancelledAsync(shipment)
+            () => shipmentService.SetCancelledAsync(
+                shipment,
+                TestContext.Current.CancellationToken
+            )
         );
 
         notificationService.Verify(

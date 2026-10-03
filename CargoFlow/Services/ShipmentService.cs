@@ -9,23 +9,30 @@ public class ShipmentService
     private readonly CargoFlowDbContext _dbContext;
     private readonly INotificationService _notificationService;
 
-    public ShipmentService(CargoFlowDbContext dbContext, INotificationService notificationService)
+    public ShipmentService(
+        CargoFlowDbContext dbContext,
+        INotificationService notificationService)
     {
-        this._dbContext = dbContext;
-        this._notificationService = notificationService;
+        _dbContext = dbContext;
+        _notificationService = notificationService;
     }
 
-    public async Task<Shipment> CreateShipmentAsync(Customer customer, string originCity,  string destinationCity, decimal weight)
+    public async Task<Shipment> CreateShipmentAsync(
+        Customer customer,
+        string originCity,
+        string destinationCity,
+        decimal weight,
+        CancellationToken cancellationToken = default)
     {
         Shipment shipment = new Shipment(
             customer,
             new Address("Germany", originCity),
             new Address("Germany", destinationCity),
             weight
-            );
+        );
 
-        _dbContext.Shipments.Add( shipment );
-        await _dbContext.SaveChangesAsync();
+        _dbContext.Shipments.Add(shipment);
+        await _dbContext.SaveChangesAsync(cancellationToken);
 
         return shipment;
     }
@@ -34,9 +41,12 @@ public class ShipmentService
         int customerId,
         string originCity,
         string destinationCity,
-        decimal weight)
+        decimal weight,
+        CancellationToken cancellationToken = default)
     {
-        var customer = await _dbContext.Customers.FindAsync(customerId);
+        var customer = await _dbContext.Customers.FindAsync(
+            [customerId],
+            cancellationToken);
 
         if (customer is null)
         {
@@ -47,43 +57,60 @@ public class ShipmentService
             customer,
             originCity,
             destinationCity,
-            weight
+            weight,
+            cancellationToken
         );
     }
 
-    public async Task<List<Shipment>> GetShipmentsAsync()
-    {
-        return await _dbContext.Shipments.Include(s => s.Customer).ToListAsync();
-    }
-
-    public async Task<Shipment?> GetShipmentByIdAsync(int id)
+    public async Task<List<Shipment>> GetShipmentsAsync(
+        CancellationToken cancellationToken = default)
     {
         return await _dbContext.Shipments
             .Include(s => s.Customer)
-            .FirstOrDefaultAsync(s => s.Id == id);
+            .ToListAsync(cancellationToken);
     }
 
-    public async Task SetInTransitAsync(Shipment shipment)
+    public async Task<Shipment?> GetShipmentByIdAsync(
+        int id,
+        CancellationToken cancellationToken = default)
+    {
+        return await _dbContext.Shipments
+            .Include(s => s.Customer)
+            .FirstOrDefaultAsync(
+                s => s.Id == id,
+                cancellationToken);
+    }
+
+    public async Task SetInTransitAsync(
+        Shipment shipment,
+        CancellationToken cancellationToken = default)
     {
         shipment.StartTransit();
-        await _dbContext.SaveChangesAsync();
 
-        this._notificationService.NotifyShipment(shipment);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+
+        _notificationService.NotifyShipment(shipment);
     }
 
-    public async Task SetDeliveredAsync(Shipment shipment)
+    public async Task SetDeliveredAsync(
+        Shipment shipment,
+        CancellationToken cancellationToken = default)
     {
         shipment.MarkAsDelivered();
-        await _dbContext.SaveChangesAsync();
 
-        this._notificationService.NotifyShipment(shipment);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+
+        _notificationService.NotifyShipment(shipment);
     }
 
-    public async Task SetCancelledAsync(Shipment shipment)
+    public async Task SetCancelledAsync(
+        Shipment shipment,
+        CancellationToken cancellationToken = default)
     {
         shipment.Cancel();
-        await _dbContext.SaveChangesAsync();
 
-        this._notificationService.NotifyShipment(shipment);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+
+        _notificationService.NotifyShipment(shipment);
     }
 }

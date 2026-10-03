@@ -18,7 +18,10 @@ public class CustomerServiceTests
 
         var customerService = new CustomerService(dbContext);
 
-        var customer = await customerService.CreateCustomerAsync("ACME GmbH");
+        var customer = await customerService.CreateCustomerAsync(
+            "ACME GmbH",
+            TestContext.Current.CancellationToken
+        );
 
         await using var verificationContext = database.CreateContext();
 
@@ -42,10 +45,19 @@ public class CustomerServiceTests
 
         var customerService = new CustomerService(dbContext);
 
-        await customerService.CreateCustomerAsync("ACME GmbH");
-        await customerService.CreateCustomerAsync("Globex AG");
+        await customerService.CreateCustomerAsync(
+            "ACME GmbH",
+            TestContext.Current.CancellationToken
+        );
 
-        var customers = await customerService.GetCustomersAsync();
+        await customerService.CreateCustomerAsync(
+            "Globex AG",
+            TestContext.Current.CancellationToken
+        );
+
+        var customers = await customerService.GetCustomersAsync(
+            TestContext.Current.CancellationToken
+        );
 
         Assert.Equal(2, customers.Count);
         Assert.Contains(customers, customer => customer.Name == "ACME GmbH");

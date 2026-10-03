@@ -1,0 +1,99 @@
+@baseUrl = http://localhost:5266
+
+### Get shipments
+
+GET {{baseUrl}}/api/shipments
+Accept: application/json
+
+###
+
+### Get shipment by ID
+
+GET {{baseUrl}}/api/shipments/1
+Accept: application/json
+
+###
+
+### Get shipment that does not exist
+
+GET {{baseUrl}}/api/shipments/999999
+Accept: application/json
+
+###
+
+### Create shipment
+
+POST {{baseUrl}}/api/shipments
+Content-Type: application/json
+
+{
+  "customerId": 1,
+  "originCity": "Cologne",
+  "destinationCity": "Berlin",
+  "weight": 850.5
+}
+
+###
+
+### Create shipment with nonexistent customer
+
+POST {{baseUrl}}/api/shipments
+Content-Type: application/json
+
+{
+  "customerId": 999999,
+  "originCity": "Cologne",
+  "destinationCity": "Berlin",
+  "weight": 850.5
+}
+
+###
+
+### Create shipment with invalid weight
+
+POST {{baseUrl}}/api/shipments
+Content-Type: application/json
+
+{
+  "customerId": 1,
+  "originCity": "Cologne",
+  "destinationCity": "Berlin",
+  "weight": 0
+}
+
+###
+
+
+### Start transit - valid transition
+GET {{baseUrl}}/api/shipments/1/start-transit
+Accept: application/json
+
+
+### Start transit - shipment does not exist, should return 404
+GET {{baseUrl}}/api/shipments/999999/start-transit
+Accept: application/json
+
+
+### Start shipment for delivery test
+GET {{baseUrl}}/api/shipments/2/start-transit
+Accept: application/json
+
+
+### Deliver in-transit shipment - 200
+GET {{baseUrl}}/api/shipments/2/deliver
+Accept: application/json
+
+
+### Deliver nonexistent shipment - 404
+GET {{baseUrl}}/api/shipments/999999/deliver
+Accept: application/json
+
+
+### Cancel planned shipment - 200
+GET {{baseUrl}}/api/shipments/3/cancel
+Accept: application/json
+
+
+### Cancel nonexistent shipment - 404
+GET {{baseUrl}}/api/shipments/999999/cancel
+Accept: application/json
