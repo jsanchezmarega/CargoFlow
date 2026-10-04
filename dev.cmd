@@ -8,6 +8,7 @@ if "%1"=="build" goto build
 if "%1"=="test" goto test
 if "%1"=="test-core" goto test-core
 if "%1"=="test-api" goto test-api
+if "%1"=="start" goto start
 if "%1"=="api" goto api
 
 if "%1"=="db-up" goto db-up
@@ -116,6 +117,14 @@ exit /b %errorlevel%
 
 :api
 dotnet watch --project CargoFlow.Api\CargoFlow.Api.csproj
+exit /b %errorlevel%
+
+
+:start
+call "%~f0" db-up
+if errorlevel 1 exit /b %errorlevel%
+
+call "%~f0" api
 exit /b %errorlevel%
 
 
@@ -247,6 +256,7 @@ echo   dev.cmd build
 echo   dev.cmd test
 echo   dev.cmd test-core
 echo   dev.cmd test-api
+echo   dev.cmd start
 echo   dev.cmd api
 echo.
 echo   dev.cmd db-up
