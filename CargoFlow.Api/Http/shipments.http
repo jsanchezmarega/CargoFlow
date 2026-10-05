@@ -1,9 +1,32 @@
 @baseUrl = http://localhost:5266
 
-### Get shipments
-
+### Get all shipments
 GET {{baseUrl}}/api/shipments
-Accept: application/json
+
+###
+
+### Get shipments by status
+GET {{baseUrl}}/api/shipments?status=InTransit
+
+###
+
+### Get shipments by customer
+GET {{baseUrl}}/api/shipments?customerId=1
+
+###
+
+### Get shipments by origin
+GET {{baseUrl}}/api/shipments?origin=Cologne
+
+###
+
+### Get shipments using multiple filters
+GET {{baseUrl}}/api/shipments?status=InTransit&customerId=1&origin=Cologne
+
+###
+
+### Invalid shipment status
+GET {{baseUrl}}/api/shipments?status=Invalid
 
 ###
 

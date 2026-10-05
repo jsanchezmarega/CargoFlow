@@ -63,11 +63,29 @@ public class ShipmentService
     }
 
     public async Task<List<Shipment>> GetShipmentsAsync(
+        ShipmentStatus? status,
+        int? customerId,
+        string? origin,
         CancellationToken cancellationToken = default)
     {
-        return await _dbContext.Shipments
+        var query = _dbContext.Shipments
             .Include(s => s.Customer)
-            .ToListAsync(cancellationToken);
+            .AsQueryable();
+
+        if (status.HasValue)
+        {
+            query = query.Where(s => s.Status == status);
+        }
+        if (customerId.HasValue)
+        {
+            query = query.Where(s => s.CustomerId == customerId);
+        }
+        if (!string.IsNullOrWhiteSpace(origin))
+        {
+            query = query.Where(s => s.Origin.City == origin);
+        }
+
+        return await query.ToListAsync(cancellationToken);
     }
 
     public async Task<Shipment?> GetShipmentByIdAsync(

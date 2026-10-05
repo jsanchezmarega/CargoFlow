@@ -48,7 +48,7 @@ public partial class Form1 : Form
 
     private async Task FetchDataAsync()
     {
-        var shipments = await _shipmentService.GetShipmentsAsync();
+        var shipments = await _shipmentService.GetShipmentsAsync(null, null, null);
         var customers = await _customerService.GetCustomersAsync();
 
         foreach (var shipment in shipments)

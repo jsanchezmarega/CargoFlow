@@ -17,14 +17,21 @@ public class ShipmentsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetShipments(
+    public async Task<ActionResult<List<ShipmentResponse>>> GetShipments(
+        [FromQuery] ShipmentStatus? status,
+        [FromQuery] int? customerId,
+        [FromQuery] string? origin,
         CancellationToken cancellationToken)
     {
         var shipments = await _shipmentService.GetShipmentsAsync(
+            status,
+            customerId,
+            origin,
             cancellationToken);
 
         return Ok(shipments.Select(ToResponse));
     }
+
     [HttpGet("{id:int}")]
     public async Task<IActionResult> GetShipment(
         int id,
@@ -68,6 +75,7 @@ public class ShipmentsController : ControllerBase
             response
         );
     }
+
     [HttpPost("{id:int}/start-transit")]
         public async Task<ActionResult<ShipmentResponse>> StartTransit(
         int id,

@@ -1,6 +1,7 @@
 ﻿using CargoFlow.Api.Tests.Infrastructure;
 using CargoFlow.Api.Tests.Models;
 using CargoFlow.Domain;
+using Microsoft.EntityFrameworkCore;
 using System.Net;
 using System.Net.Http.Json;
 
@@ -61,6 +62,332 @@ public class ShipmentEndpointsTests
         Assert.Equal("Berlin", responseShipment.Destination);
         Assert.Equal(125.5m, responseShipment.Weight);
         Assert.Equal("Planned", responseShipment.Status);
+    }
+
+    [Fact]
+    public async Task GetShipments_ReturnsAllShipments()
+    {
+        using var factory = new CargoFlowWebApplicationFactory();
+
+        var firstShipment = await factory.ExecuteDbAsync(
+            dbContext => TestData.CreateShipmentAsync(
+                dbContext,
+                customerName: "First Customer",
+                originCity: "Cologne",
+                destinationCity: "Berlin",
+                cancellationToken:
+                    TestContext.Current.CancellationToken));
+
+        var secondShipment = await factory.ExecuteDbAsync(
+            dbContext => TestData.CreateShipmentAsync(
+                dbContext,
+                customerName: "Second Customer",
+                originCity: "Hamburg",
+                destinationCity: "Munich",
+                cancellationToken:
+                    TestContext.Current.CancellationToken));
+
+        using var client = factory.CreateClient();
+
+        var response = await client.GetAsync(
+            "/api/shipments",
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var shipments =
+            await response.Content.ReadFromJsonAsync<List<ShipmentResponseJson>>(
+                TestContext.Current.CancellationToken);
+
+        Assert.NotNull(shipments);
+        Assert.Equal(2, shipments.Count);
+
+        Assert.Contains(
+            shipments,
+            shipment => shipment.Id == firstShipment.Id);
+
+        Assert.Contains(
+            shipments,
+            shipment => shipment.Id == secondShipment.Id);
+    }
+
+    [Fact]
+    public async Task GetShipments_WithStatusFilter_ReturnsOnlyMatchingShipments()
+    {
+        using var factory = new CargoFlowWebApplicationFactory();
+
+        var shipments = await factory.ExecuteDbAsync(
+            async dbContext =>
+            {
+                var plannedShipment =
+                    await TestData.CreateShipmentAsync(
+                        dbContext,
+                        customerName: "Planned Customer",
+                        cancellationToken:
+                            TestContext.Current.CancellationToken);
+
+                var inTransitShipment =
+                    await TestData.CreateShipmentAsync(
+                        dbContext,
+                        customerName: "In Transit Customer",
+                        cancellationToken:
+                            TestContext.Current.CancellationToken);
+
+                inTransitShipment.StartTransit();
+
+                await dbContext.SaveChangesAsync(
+                    TestContext.Current.CancellationToken);
+
+                return new
+                {
+                    plannedShipment = plannedShipment,
+                    inTransitShipment = inTransitShipment
+                };
+            });
+
+        using var client = factory.CreateClient();
+
+        var response = await client.GetAsync(
+            "/api/shipments?status=InTransit",
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var responseShipments =
+            await response.Content.ReadFromJsonAsync<List<ShipmentResponseJson>>(
+                TestContext.Current.CancellationToken);
+
+        Assert.NotNull(responseShipments);
+
+        var responseShipment = Assert.Single(responseShipments);
+
+        Assert.Equal(
+            shipments.inTransitShipment.Id,
+            responseShipment.Id);
+
+        Assert.Equal(
+            "InTransit",
+            responseShipment.Status);
+    }
+
+    [Fact]
+    public async Task GetShipments_WithInvalidStatus_ReturnsBadRequest()
+    {
+        using var factory = new CargoFlowWebApplicationFactory();
+        using var client = factory.CreateClient();
+
+        var response = await client.GetAsync(
+            "/api/shipments?status=Invalid",
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal(
+            HttpStatusCode.BadRequest,
+            response.StatusCode);
+    }
+
+    [Fact]
+    public async Task GetShipments_WithCustomerIdFilter_ReturnsOnlyMatchingShipments()
+    {
+        using var factory = new CargoFlowWebApplicationFactory();
+
+        var shipments = await factory.ExecuteDbAsync(
+            async dbContext =>
+            {
+                var shipment1 =
+                    await TestData.CreateShipmentAsync(
+                        dbContext,
+                        customerName: "Customer 1",
+                        cancellationToken:
+                            TestContext.Current.CancellationToken);
+
+                var shipment2 =
+                    await TestData.CreateShipmentAsync(
+                        dbContext,
+                        customerName: "Customer 2",
+                        cancellationToken:
+                            TestContext.Current.CancellationToken);
+
+                await dbContext.SaveChangesAsync(
+                    TestContext.Current.CancellationToken);
+
+                return new
+                {
+                    shipment1 = shipment1,
+                    shipment2 = shipment2
+                };
+            });
+
+        using var client = factory.CreateClient();
+
+        var response = await client.GetAsync(
+            $"/api/shipments?customerId={shipments.shipment1.CustomerId}",
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var responseShipments =
+            await response.Content.ReadFromJsonAsync<List<ShipmentResponseJson>>(
+                TestContext.Current.CancellationToken);
+
+        Assert.NotNull(responseShipments);
+
+        var responseShipment = Assert.Single(responseShipments);
+
+        Assert.Equal(
+            shipments.shipment1.Id,
+            responseShipment.Id);
+
+        Assert.Equal(
+            shipments.shipment1.Customer.Id,
+            responseShipment.CustomerId);
+    }
+
+    [Fact]
+    public async Task GetShipments_WithOriginFilter_ReturnsOnlyMatchingShipments()
+    {
+        using var factory = new CargoFlowWebApplicationFactory();
+
+        var shipments = await factory.ExecuteDbAsync(
+            async dbContext =>
+            {
+                var cologneShipment =
+                    await TestData.CreateShipmentAsync(
+                        dbContext,
+                        customerName: "Cologne Customer",
+                        originCity: "Cologne",
+                        cancellationToken:
+                            TestContext.Current.CancellationToken);
+
+                var hamburgShipment =
+                    await TestData.CreateShipmentAsync(
+                        dbContext,
+                        customerName: "Hamburg Customer",
+                        originCity: "Hamburg",
+                        cancellationToken:
+                            TestContext.Current.CancellationToken);
+
+                return new
+                {
+                    CologneShipment = cologneShipment,
+                    HamburgShipment = hamburgShipment
+                };
+            });
+
+        using var client = factory.CreateClient();
+
+        var response = await client.GetAsync(
+            "/api/shipments?origin=Cologne",
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var responseShipments =
+            await response.Content.ReadFromJsonAsync<List<ShipmentResponseJson>>(
+                TestContext.Current.CancellationToken);
+
+        Assert.NotNull(responseShipments);
+
+        var responseShipment = Assert.Single(responseShipments);
+
+        Assert.Equal(
+            shipments.CologneShipment.Id,
+            responseShipment.Id);
+
+        Assert.Equal(
+            "Cologne",
+            responseShipment.Origin);
+    }
+
+    [Fact]
+    public async Task GetShipments_WithStatusCustomerIdAndOriginFilters_ReturnsOnlyMatchingShipment()
+    {
+        using var factory = new CargoFlowWebApplicationFactory();
+
+        var shipments = await factory.ExecuteDbAsync(
+            async dbContext =>
+            {
+                var firstCustomer = new Customer("First Customer");
+                var secondCustomer = new Customer("Second Customer");
+
+                // Matches customer + origin, but not status.
+                var plannedFirstCustomerCologne = new Shipment(
+                    firstCustomer,
+                    new Address("Germany", "Cologne"),
+                    new Address("Germany", "Berlin"),
+                    100m);
+
+                // Matches all three filters.
+                var inTransitFirstCustomerCologne = new Shipment(
+                    firstCustomer,
+                    new Address("Germany", "Cologne"),
+                    new Address("Germany", "Munich"),
+                    200m);
+
+                // Matches status + origin, but not customer.
+                var inTransitSecondCustomerCologne = new Shipment(
+                    secondCustomer,
+                    new Address("Germany", "Cologne"),
+                    new Address("Germany", "Berlin"),
+                    300m);
+
+                // Matches status + customer, but not origin.
+                var inTransitFirstCustomerHamburg = new Shipment(
+                    firstCustomer,
+                    new Address("Germany", "Hamburg"),
+                    new Address("Germany", "Berlin"),
+                    400m);
+
+                inTransitFirstCustomerCologne.StartTransit();
+                inTransitSecondCustomerCologne.StartTransit();
+                inTransitFirstCustomerHamburg.StartTransit();
+
+                dbContext.Shipments.AddRange(
+                    plannedFirstCustomerCologne,
+                    inTransitFirstCustomerCologne,
+                    inTransitSecondCustomerCologne,
+                    inTransitFirstCustomerHamburg);
+
+                await dbContext.SaveChangesAsync(
+                    TestContext.Current.CancellationToken);
+
+                return new
+                {
+                    ExpectedShipment = inTransitFirstCustomerCologne,
+                    CustomerId = firstCustomer.Id
+                };
+            });
+
+        using var client = factory.CreateClient();
+
+        var response = await client.GetAsync(
+            $"/api/shipments?status=InTransit&customerId={shipments.CustomerId}&origin=Cologne",
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var responseShipments =
+            await response.Content.ReadFromJsonAsync<List<ShipmentResponseJson>>(
+                TestContext.Current.CancellationToken);
+
+        Assert.NotNull(responseShipments);
+
+        var responseShipment = Assert.Single(responseShipments);
+
+        Assert.Equal(
+            shipments.ExpectedShipment.Id,
+            responseShipment.Id);
+
+        Assert.Equal(
+            shipments.CustomerId,
+            responseShipment.CustomerId);
+
+        Assert.Equal(
+            "InTransit",
+            responseShipment.Status);
+
+        Assert.Equal(
+            "Cologne",
+            responseShipment.Origin);
     }
 
     [Fact]
