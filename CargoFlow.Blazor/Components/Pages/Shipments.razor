@@ -1,0 +1,39 @@
+﻿@page "/shipments"
+@rendermode InteractiveServer
+@inject IHttpClientFactory ClientFactory
+
+<PageTitle>Shipments</PageTitle>
+
+<h1>Shipments</h1>
+
+<p>Manage CargoFlow shipments.</p>
+
+
+@if (errorMessage is not null)
+{
+    <div class="alert alert-danger">@errorMessage</div>
+} else if (shipments is null)
+{
+    <div>Loading shipments...</div>
+} else
+{
+    <ShipmentTable Shipments="@shipments" />
+}
+
+@code {
+    private ShipmentResponse[]? shipments;
+    private string? errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var client = ClientFactory.CreateClient("CargoFlowApi");
+        try
+        {
+            shipments = await client.GetFromJsonAsync<ShipmentResponse[]>("api/shipments");
+
+        } catch(HttpRequestException)
+        {
+            errorMessage = "Failed to retrieve shipments: Please try again later.";
+        }
+    }
+}

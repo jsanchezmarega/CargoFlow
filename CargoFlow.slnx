@@ -1,6 +1,7 @@
 <Solution>
   <Project Path="CargoFlow.Api.Tests/CargoFlow.Api.Tests.csproj" />
   <Project Path="CargoFlow.Api/CargoFlow.Api.csproj" />
+  <Project Path="CargoFlow.Blazor/CargoFlow.Blazor.csproj" />
   <Project Path="CargoFlow.Desktop/CargoFlow.Desktop.csproj" />
   <Project Path="CargoFlow.DevTools/CargoFlow.DevTools.csproj" />
   <Project Path="CargoFlow.Tests/CargoFlow.Tests.csproj" />

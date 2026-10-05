@@ -1,0 +1,38 @@
+﻿
+@if(Shipments.Any())
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Customer</th>
+                <th>Origin</th>
+                <th>Destination</th>
+                <th>Weight</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var shipment in Shipments)
+            {
+                <tr>
+                    <td>@shipment.Id</td>
+                    <td>@shipment.CustomerName</td>
+                    <td>@shipment.Origin</td>
+                    <td>@shipment.Destination</td>
+                    <td>@shipment.Weight</td>
+                    <td>@shipment.Status</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+} else
+{
+    <div>No shipments found.</div>
+}
+
+
+@code {
+    [Parameter]
+    public IEnumerable<ShipmentResponse> Shipments { get; set; } = [];
+}
