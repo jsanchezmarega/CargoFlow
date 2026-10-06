@@ -8,32 +8,147 @@
 
 <p>Manage CargoFlow shipments.</p>
 
+<div class="d-flex gap-3 mb-3">
+    <div class="mb-3" style="max-width: 220px;">
+        <label for="statusFilter" class="form-label">Status</label>
+        <select id="statusFilter"
+                @bind="selectedStatus"
+                @bind:after="ApplyFiltersAsync"
+                disabled="@isLoadingShipments"
+                class="form-select">
+            <option value="">All</option>
+            <option value="Planned">Planned</option>
+            <option value="InTransit">InTransit</option>
+            <option value="Delivered">Delivered</option>
+            <option value="Cancelled">Cancelled</option>
+        </select>
+    </div>
+    <div class="mb-3" style="max-width: 220px;">
+        <label for="customerFilter" class="form-label">Customer</label>
+        <select id="customerFilter"
+                @bind="selectedCustomerId"
+                @bind:after="ApplyFiltersAsync"
+                disabled="@(isLoadingCustomers || isLoadingShipments)"
+                class="form-select">
+            @if (customers is not null && !isLoadingCustomers)
+            {
+                <option value="">All</option>
+                @foreach(var customer in customers)
+                {
+                    <option value="@customer.Id">@customer.Name</option>
+                }
+            } else
+            {
+                <option value="">@(isLoadingCustomers ? "Loading customers..." : "Failed to load customers")</option>
+            }
+        </select>
+        @if (customerErrorMessage is not null)
+        {
+            <div class="text-danger small">@customerErrorMessage</div>
+        }
+    </div>
+    <div class="mb-3" style="width: 220px;">
+        <label for="originFilter" class="form-label">Origin</label>
+        <input id="originFilter"
+               type="text"
+               class="form-control"
+               @bind="selectedOrigin"
+               @bind:after="ApplyFiltersAsync"
+               disabled="@isLoadingShipments"
+               placeholder="e.g. Cologne" />
+    </div>
+</div>
 
 @if (errorMessage is not null)
 {
     <div class="alert alert-danger">@errorMessage</div>
-} else if (shipments is null)
+}
+else if (shipments is null)
 {
     <div>Loading shipments...</div>
-} else
+}
+else
 {
     <ShipmentTable Shipments="@shipments" />
 }
 
 @code {
     private ShipmentResponse[]? shipments;
+    private CustomerResponse[]? customers;
     private string? errorMessage;
+    private string? customerErrorMessage;
+    private string selectedStatus = "";
+    private int? selectedCustomerId;
+    private bool isLoadingShipments;
+    private bool isLoadingCustomers;
+    private string selectedOrigin = "";
 
     protected override async Task OnInitializedAsync()
+    {
+        await Task.WhenAll([
+            LoadShipmentsAsync(),
+            LoadCustomersAsync()
+        ]);
+    }
+
+    private async Task ApplyFiltersAsync()
+    {
+        await LoadShipmentsAsync();
+    }
+
+    private async Task LoadShipmentsAsync()
     {
         var client = ClientFactory.CreateClient("CargoFlowApi");
         try
         {
-            shipments = await client.GetFromJsonAsync<ShipmentResponse[]>("api/shipments");
+            isLoadingShipments = true;
+            errorMessage = null;
+            List<string> queryParams = [];
 
-        } catch(HttpRequestException)
+            if (!string.IsNullOrEmpty(selectedStatus))
+            {
+                queryParams.Add($"status={selectedStatus}");
+            }
+            if (selectedCustomerId is not null)
+            {
+                queryParams.Add($"customerId={selectedCustomerId}");
+            }
+            if (!string.IsNullOrWhiteSpace(selectedOrigin))
+            {
+                queryParams.Add($"origin={Uri.EscapeDataString(selectedOrigin.Trim())}");
+            }
+            var queryString = queryParams.Count > 0
+                ? $"?{string.Join("&", queryParams)}"
+                : "";
+
+            shipments = await client.GetFromJsonAsync<ShipmentResponse[]>($"api/shipments{queryString}");
+        }
+        catch (HttpRequestException)
         {
             errorMessage = "Failed to retrieve shipments: Please try again later.";
+        }
+        finally
+        {
+            isLoadingShipments = false;
+        }
+    }
+
+    private async Task LoadCustomersAsync()
+    {
+        var client = ClientFactory.CreateClient("CargoFlowApi");
+        try
+        {
+            isLoadingCustomers = true;
+            customerErrorMessage = null;
+            customers = await client.GetFromJsonAsync<CustomerResponse[]>("api/customers");
+        }
+        catch (HttpRequestException)
+        {
+            customerErrorMessage = "Failed to retrieve customers: Please try again later.";
+        }
+        finally
+        {
+            isLoadingCustomers = false;
         }
     }
 }
