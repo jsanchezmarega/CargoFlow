@@ -9,17 +9,20 @@ The application currently includes:
 - A logistics domain model with customers, shipments, and controlled shipment lifecycle transitions.
 - A Windows desktop application for managing shipment data.
 - A REST API for accessing and managing customers and shipments.
+- A Blazor web application for viewing and filtering shipments.
 - SQL Server persistence with database migrations and development seed data.
 - Automated domain, service, persistence, and API integration tests.
-- A Docker-based local development environment and supporting development tooling.
+- A Docker Compose development environment with hot reload for the API and Blazor applications.
+- Development tooling for setup, database management, migrations, testing, and Git hooks.
 
-The project is actively being developed as I expand my experience with the .NET ecosystem. Planned areas include a Blazor web interface, .NET MAUI, and further exploration of the Microsoft Azure platform.
+The project is actively being developed as I expand my experience with the .NET ecosystem. Planned areas include further development of the Blazor interface, .NET MAUI, and exploration of the Microsoft Azure platform.
 
 ## Tech Stack
 
 - .NET 10
 - C#
 - ASP.NET Core
+- Blazor
 - Entity Framework Core
 - SQL Server
 - SQLite for automated tests
@@ -36,8 +39,9 @@ The solution is split into several projects:
 - **CargoFlow** — Domain model, application services, persistence, and Entity Framework Core migrations.
 - **CargoFlow.Api** — ASP.NET Core REST API for customers and shipments.
 - **CargoFlow.Api.Tests** — HTTP integration tests for the ASP.NET Core API.
+- **CargoFlow.Blazor** — Blazor web application consuming the REST API.
 - **CargoFlow.Desktop** — WinForms desktop application using DevExpress.
-- **CargoFlow.Tests** — Domain and service tests.
+- **CargoFlow.Tests** — Domain, service, and persistence tests.
 - **CargoFlow.DevTools** — Development utilities such as database seeding.
 
 ## Prerequisites
@@ -85,29 +89,60 @@ If the configured SQL Server port is already occupied, setup will stop. Change `
 
 Existing `.env` files are never overwritten.
 
+The default development ports are configured in `.env`:
+
+```text
+DB_PORT=1433
+API_PORT=5266
+BLAZOR_PORT=5000
+```
+
 ## Running CargoFlow
 
-To start the development database and ASP.NET Core API together:
+Start the complete development environment with:
 
 ```bat
 dev.cmd start
 ```
 
-This starts SQL Server through Docker Compose and launches the API using `dotnet watch`.
+Docker Compose starts:
+
+- SQL Server
+- CargoFlow API
+- CargoFlow Blazor
+
+The API and Blazor applications run using `dotnet watch`, so source changes are detected and applied during development.
+
+With the default `.env` configuration:
+
+```text
+Blazor: http://localhost:5000
+API:    http://localhost:5266
+```
 
 `start` does not apply migrations or seed the database. Run `dev.cmd setup` for initial setup or use the individual database commands when database maintenance is required.
 
-Stopping the API does not automatically stop the SQL Server container. To stop the database:
+Stop and remove the development containers and Compose network with:
 
 ```bat
-dev.cmd db-down
+dev.cmd stop
 ```
 
-The API can also be started independently:
+The persistent SQL Server data volume is retained.
+
+Individual parts of the application can also be started through Docker Compose:
 
 ```bat
 dev.cmd api
 ```
+
+starts the API and its SQL Server dependency.
+
+```bat
+dev.cmd blazor
+```
+
+starts Blazor together with the API and SQL Server dependency chain.
 
 ## Development Commands
 
@@ -117,7 +152,7 @@ dev.cmd api
 dev.cmd build
 ```
 
-Builds the solution.
+Builds the solution on the host.
 
 ### Tests
 
@@ -127,7 +162,7 @@ Run all automated tests:
 dev.cmd test
 ```
 
-Run only the core domain and service tests:
+Run only the core domain, service, and persistence tests:
 
 ```bat
 dev.cmd test-core
@@ -139,23 +174,35 @@ Run only the API integration tests:
 dev.cmd test-api
 ```
 
-### API
+### Development Environment
 
-Start the API with `dotnet watch`:
-
-```bat
-dev.cmd api
-```
-
-Start both SQL Server and the API:
+Start the complete Docker Compose development environment:
 
 ```bat
 dev.cmd start
 ```
 
+Stop the development environment:
+
+```bat
+dev.cmd stop
+```
+
+Start the API and its dependencies:
+
+```bat
+dev.cmd api
+```
+
+Start the Blazor application and its dependencies:
+
+```bat
+dev.cmd blazor
+```
+
 ### Database
 
-Start SQL Server:
+Start only SQL Server in the background:
 
 ```bat
 dev.cmd db-up
@@ -193,11 +240,26 @@ dev.cmd db-reset
 
 This drops the existing database, reapplies all migrations, and runs the seed process.
 
-Connect to SQL Server using `sqlcmd`:
+Connect directly to the CargoFlow development database using `sqlcmd`:
 
 ```bat
 dev.cmd db-client
 ```
+
+## Web Application
+
+`CargoFlow.Blazor` is a Blazor web application that consumes `CargoFlow.Api` over HTTP.
+
+The shipments page currently supports:
+
+- Retrieving shipments from the REST API.
+- Filtering shipments by status.
+- Filtering shipments by customer.
+- Filtering shipments by origin.
+- Loading customer data for filter selection.
+- Loading and error states for API requests.
+
+The Blazor application and API run as separate services in Docker Compose. Within the Docker network, Blazor communicates with the API using the Compose service name rather than a host port.
 
 ## REST API
 
@@ -222,6 +284,8 @@ POST /api/shipments/{id}/start-transit
 POST /api/shipments/{id}/deliver
 POST /api/shipments/{id}/cancel
 ```
+
+The shipment collection endpoint supports optional filtering by status, customer, and origin.
 
 Shipment lifecycle operations are explicit commands rather than direct status updates so that state transitions remain controlled by the domain model.
 
@@ -294,7 +358,7 @@ The integration tests cover:
 
 - Customer collection and individual-resource endpoints.
 - Customer creation and request validation.
-- Shipment retrieval and creation.
+- Shipment retrieval, filtering, and creation.
 - Shipment lifecycle operations.
 - `404 Not Found` behavior.
 - `409 Conflict` behavior for invalid lifecycle transitions.
@@ -334,10 +398,12 @@ The domain model owns these transition rules. The desktop application, applicati
 
 Local SQL Server runs in Docker and persists its data in a Docker volume.
 
+The API connects to SQL Server over the internal Docker Compose network, while host-side Entity Framework and development commands connect through the SQL Server port configured in `.env`.
+
 Development seed data can be recreated at any time with:
 
 ```bat
 dev.cmd db-reset
 ```
 
-The seed process creates customers and shipments in several lifecycle states so that the desktop UI and API can be exercised without manually creating data.
+The seed process creates customers and shipments in several lifecycle states so that the desktop application, REST API, and Blazor interface can be exercised without manually creating data.

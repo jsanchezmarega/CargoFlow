@@ -6,7 +6,10 @@ public static class DatabaseConfiguration
 {
     public static string GetConnectionString()
     {
-        Env.TraversePath().Load();
+        if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("DB_HOST")))
+        {
+            Env.TraversePath().Load();
+        }
 
         var host = GetRequiredEnvironmentVariable("DB_HOST");
         var port = GetRequiredEnvironmentVariable("DB_PORT");

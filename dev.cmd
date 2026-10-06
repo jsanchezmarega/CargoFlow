@@ -9,7 +9,9 @@ if "%1"=="test" goto test
 if "%1"=="test-core" goto test-core
 if "%1"=="test-api" goto test-api
 if "%1"=="start" goto start
+if "%1"=="stop" goto stop
 if "%1"=="api" goto api
+if "%1"=="blazor" goto blazor
 
 if "%1"=="db-up" goto db-up
 if "%1"=="db-down" goto db-down
@@ -115,26 +117,33 @@ dotnet test CargoFlow.Api.Tests\CargoFlow.Api.Tests.csproj
 exit /b %errorlevel%
 
 
-:api
-dotnet watch --project CargoFlow.Api\CargoFlow.Api.csproj
+:start
+docker compose up
 exit /b %errorlevel%
 
 
-:start
-call "%~f0" db-up
-if errorlevel 1 exit /b %errorlevel%
+:stop
+docker compose down
+exit /b %errorlevel%
 
-call "%~f0" api
+
+:api
+docker compose up api
+exit /b %errorlevel%
+
+
+:blazor
+docker compose up blazor
 exit /b %errorlevel%
 
 
 :db-up
-docker compose up -d
+docker compose up -d sqlserver
 exit /b %errorlevel%
 
 
 :db-down
-docker compose down
+docker compose stop sqlserver
 exit /b %errorlevel%
 
 
@@ -197,7 +206,7 @@ exit /b 0
 
 
 :db-client
-docker compose exec sqlserver /bin/bash -c "/opt/mssql-tools18/bin/sqlcmd -S \"$DB_HOST\" -U \"$DB_USER\" -P \"$DB_PASSWORD\" -d \"$DB_NAME\" -C"
+docker compose exec sqlserver /bin/bash -c "/opt/mssql-tools18/bin/sqlcmd -S localhost -U \"$DB_USER\" -P \"$DB_PASSWORD\" -d \"$DB_NAME\" -C"
 exit /b %errorlevel%
 
 
@@ -257,7 +266,9 @@ echo   dev.cmd test
 echo   dev.cmd test-core
 echo   dev.cmd test-api
 echo   dev.cmd start
+echo   dev.cmd stop
 echo   dev.cmd api
+echo   dev.cmd blazor
 echo.
 echo   dev.cmd db-up
 echo   dev.cmd db-down

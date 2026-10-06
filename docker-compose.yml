@@ -6,8 +6,6 @@ services:
       ACCEPT_EULA: "Y"
       MSSQL_PID: "Developer"
       MSSQL_SA_PASSWORD: "${DB_PASSWORD}"
-      DB_HOST: "${DB_HOST}"
-      DB_PORT: "${DB_PORT}"
       DB_NAME: "${DB_NAME}"
       DB_USER: "${DB_USER}"
       DB_PASSWORD: "${DB_PASSWORD}"
@@ -26,5 +24,55 @@ services:
       retries: 12
       start_period: 10s
 
+  api:
+    build:
+      context: .
+      dockerfile: CargoFlow.Api/Dockerfile.dev
+    container_name: cargoflow-api
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_HTTP_PORTS: 8080
+
+      DB_HOST: sqlserver
+      DB_PORT: 1433
+      DB_NAME: "${DB_NAME}"
+      DB_USER: "${DB_USER}"
+      DB_PASSWORD: "${DB_PASSWORD}"
+    ports:
+      - "${API_PORT}:8080"
+    volumes:
+      - .:/src
+      - api-bin:/src/CargoFlow.Api/bin
+      - api-obj:/src/CargoFlow.Api/obj
+      - core-bin:/src/CargoFlow/bin
+      - core-obj:/src/CargoFlow/obj
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+
+  blazor:
+    build:
+      context: .
+      dockerfile: CargoFlow.Blazor/Dockerfile.dev
+    container_name: cargoflow-blazor
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_HTTP_PORTS: 8080
+      CargoFlowApi__BaseUrl: http://api:8080
+    ports:
+      - "${BLAZOR_PORT}:8080"
+    volumes:
+      - .:/src
+      - blazor-bin:/src/CargoFlow.Blazor/bin
+      - blazor-obj:/src/CargoFlow.Blazor/obj
+    depends_on:
+      - api
+
 volumes:
   cargoflow-sqlserver-data:
+  api-bin:
+  api-obj:
+  core-bin:
+  core-obj:
+  blazor-bin:
+  blazor-obj:

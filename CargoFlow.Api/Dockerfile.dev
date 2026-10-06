@@ -1,0 +1,7 @@
+FROM mcr.microsoft.com/dotnet/sdk:10.0
+
+WORKDIR /src/CargoFlow.Api
+
+ENV DOTNET_USE_POLLING_FILE_WATCHER=true
+
+CMD ["dotnet", "watch", "run", "--no-launch-profile"]
