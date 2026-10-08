@@ -1,6 +1,9 @@
 ﻿@page "/shipments"
 @rendermode InteractiveServer
-@inject IHttpClientFactory ClientFactory
+@using System.Net
+@using CargoFlow.Blazor.Services
+@inject ShipmentApiClient ShipmentApi
+@inject CustomerApiClient CustomerApi
 
 <PageTitle>Shipments</PageTitle>
 
@@ -23,6 +26,7 @@
             <option value="Cancelled">Cancelled</option>
         </select>
     </div>
+
     <div class="mb-3" style="max-width: 220px;">
         <label for="customerFilter" class="form-label">Customer</label>
         <select id="customerFilter"
@@ -33,11 +37,12 @@
             @if (customers is not null && !isLoadingCustomers)
             {
                 <option value="">All</option>
-                @foreach(var customer in customers)
+                @foreach (var customer in customers)
                 {
                     <option value="@customer.Id">@customer.Name</option>
                 }
-            } else
+            }
+            else
             {
                 <option value="">@(isLoadingCustomers ? "Loading customers..." : "Failed to load customers")</option>
             }
@@ -47,6 +52,7 @@
             <div class="text-danger small">@customerErrorMessage</div>
         }
     </div>
+
     <div class="mb-3" style="width: 220px;">
         <label for="originFilter" class="form-label">Origin</label>
         <input id="originFilter"
@@ -63,13 +69,27 @@
 {
     <div class="alert alert-danger">@errorMessage</div>
 }
-else if (shipments is null)
+
+@if (actionErrorMessage is not null)
 {
-    <div>Loading shipments...</div>
+    <div class="alert alert-danger">@actionErrorMessage</div>
+}
+
+@if (shipments is null)
+{
+    @if (errorMessage is null)
+    {
+        <div>Loading shipments...</div>
+    }
 }
 else
 {
-    <ShipmentTable Shipments="@shipments" />
+    <ShipmentTable
+        Shipments="@shipments"
+        ProcessingShipmentId="@processingShipmentId"
+        OnStartTransit="@StartTransitAsync"
+        OnDeliver="@SetDeliveredAsync"
+        OnCancel="@SetCancelledAsync" />
 }
 
 @code {
@@ -77,18 +97,21 @@ else
     private CustomerResponse[]? customers;
     private string? errorMessage;
     private string? customerErrorMessage;
+    private string? actionErrorMessage;
+
     private string selectedStatus = "";
     private int? selectedCustomerId;
+    private string selectedOrigin = "";
+
     private bool isLoadingShipments;
     private bool isLoadingCustomers;
-    private string selectedOrigin = "";
+    private int? processingShipmentId;
 
     protected override async Task OnInitializedAsync()
     {
-        await Task.WhenAll([
+        await Task.WhenAll(
             LoadShipmentsAsync(),
-            LoadCustomersAsync()
-        ]);
+            LoadCustomersAsync());
     }
 
     private async Task ApplyFiltersAsync()
@@ -98,30 +121,15 @@ else
 
     private async Task LoadShipmentsAsync()
     {
-        var client = ClientFactory.CreateClient("CargoFlowApi");
         try
         {
             isLoadingShipments = true;
             errorMessage = null;
-            List<string> queryParams = [];
 
-            if (!string.IsNullOrEmpty(selectedStatus))
-            {
-                queryParams.Add($"status={selectedStatus}");
-            }
-            if (selectedCustomerId is not null)
-            {
-                queryParams.Add($"customerId={selectedCustomerId}");
-            }
-            if (!string.IsNullOrWhiteSpace(selectedOrigin))
-            {
-                queryParams.Add($"origin={Uri.EscapeDataString(selectedOrigin.Trim())}");
-            }
-            var queryString = queryParams.Count > 0
-                ? $"?{string.Join("&", queryParams)}"
-                : "";
-
-            shipments = await client.GetFromJsonAsync<ShipmentResponse[]>($"api/shipments{queryString}");
+            shipments = await ShipmentApi.GetShipmentsAsync(
+                selectedStatus,
+                selectedCustomerId,
+                selectedOrigin);
         }
         catch (HttpRequestException)
         {
@@ -135,12 +143,12 @@ else
 
     private async Task LoadCustomersAsync()
     {
-        var client = ClientFactory.CreateClient("CargoFlowApi");
         try
         {
             isLoadingCustomers = true;
             customerErrorMessage = null;
-            customers = await client.GetFromJsonAsync<CustomerResponse[]>("api/customers");
+
+            customers = await CustomerApi.GetCustomersAsync();
         }
         catch (HttpRequestException)
         {
@@ -151,4 +159,56 @@ else
             isLoadingCustomers = false;
         }
     }
+
+    private async Task ChangeStatus(int shipmentId, string action)
+    {
+        actionErrorMessage = null;
+        processingShipmentId = shipmentId;
+
+        try
+        {
+            var statusCode = await ShipmentApi.ChangeStatusAsync(shipmentId, action);
+
+            if ((int)statusCode >= 200 && (int)statusCode < 300)
+            {
+                await LoadShipmentsAsync();
+            }
+            else if (statusCode == HttpStatusCode.Conflict)
+            {
+                actionErrorMessage =
+                    "This shipment cannot perform that action in its current state. Refresh the list and try again.";
+            }
+            else if (statusCode == HttpStatusCode.NotFound)
+            {
+                actionErrorMessage = "This shipment no longer exists.";
+            }
+            else
+            {
+                actionErrorMessage = action switch
+                {
+                    "start-transit" => "Failed to start shipment transit.",
+                    "deliver" => "Failed to set shipment to delivered.",
+                    "cancel" => "Failed to cancel shipment.",
+                    _ => "Failed to update shipment."
+                };
+            }
+        }
+        catch (HttpRequestException)
+        {
+            actionErrorMessage = "Failed to update shipment: Please try again later.";
+        }
+        finally
+        {
+            processingShipmentId = null;
+        }
+    }
+
+    private Task StartTransitAsync(int shipmentId)
+        => ChangeStatus(shipmentId, "start-transit");
+
+    private Task SetDeliveredAsync(int shipmentId)
+        => ChangeStatus(shipmentId, "deliver");
+
+    private Task SetCancelledAsync(int shipmentId)
+        => ChangeStatus(shipmentId, "cancel");
 }

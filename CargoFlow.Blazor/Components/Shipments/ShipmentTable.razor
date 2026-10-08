@@ -10,6 +10,7 @@
                 <th>Destination</th>
                 <th>Weight</th>
                 <th>Status</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -22,6 +23,35 @@
                     <td>@shipment.Destination</td>
                     <td>@shipment.Weight</td>
                     <td>@shipment.Status</td>
+                    <td>
+                        <div class="d-flex align-items-center gap-2">
+                            @if (shipment.Status == "Planned")
+                            {
+                                <button class="btn btn-sm btn-primary"
+                                        disabled="@(ProcessingShipmentId is not null)"
+                                        @onclick="() => OnStartTransit.InvokeAsync(shipment.Id)">
+                                    Start Transit
+                                </button>
+                            }
+                            else if (shipment.Status == "InTransit")
+                            {
+                                <button class="btn btn-sm btn-success"
+                                        disabled="@(ProcessingShipmentId is not null)"
+                                        @onclick="() => OnDeliver.InvokeAsync(shipment.Id)">
+                                    Mark Delivered
+                                </button>
+                            }
+
+                            @if (shipment.Status is "Planned" or "InTransit")
+                            {
+                                <button class="btn btn-sm btn-outline-danger"
+                                        disabled="@(ProcessingShipmentId is not null)"
+                                        @onclick="() => OnCancel.InvokeAsync(shipment.Id)">
+                                    Cancel
+                                </button>
+                            }
+                        </div>
+                    </td>
                 </tr>
             }
         </tbody>
@@ -35,4 +65,16 @@
 @code {
     [Parameter]
     public IEnumerable<ShipmentResponse> Shipments { get; set; } = [];
+
+    [Parameter]
+    public EventCallback<int> OnStartTransit { get; set; }
+
+    [Parameter]
+    public EventCallback<int> OnDeliver { get; set; }
+
+    [Parameter]
+    public EventCallback<int> OnCancel { get; set; }
+
+    [Parameter]
+    public int? ProcessingShipmentId { get; set; }
 }

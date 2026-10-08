@@ -12,6 +12,8 @@ if "%1"=="start" goto start
 if "%1"=="stop" goto stop
 if "%1"=="api" goto api
 if "%1"=="blazor" goto blazor
+if "%1"=="restart-api" goto restart-api
+if "%1"=="restart-blazor" goto restart-blazor
 
 if "%1"=="db-up" goto db-up
 if "%1"=="db-down" goto db-down
@@ -134,6 +136,16 @@ exit /b %errorlevel%
 
 :blazor
 docker compose up blazor
+exit /b %errorlevel%
+
+
+:restart-api
+docker compose restart api
+exit /b %errorlevel%
+
+
+:restart-blazor
+docker compose restart blazor
 exit /b %errorlevel%
 
 
@@ -269,6 +281,8 @@ echo   dev.cmd start
 echo   dev.cmd stop
 echo   dev.cmd api
 echo   dev.cmd blazor
+echo   dev.cmd restart-api
+echo   dev.cmd restart-blazor
 echo.
 echo   dev.cmd db-up
 echo   dev.cmd db-down
