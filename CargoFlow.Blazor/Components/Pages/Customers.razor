@@ -1,0 +1,52 @@
+﻿@page "/customers"
+@rendermode InteractiveServer
+@using CargoFlow.Blazor.Services
+@inject CustomerApiClient CustomerApi
+
+<PageTitle>Customers</PageTitle>
+
+<h1>Customers</h1>
+
+<p>Manage CargoFlow customers.</p>
+
+<CustomerForm OnCustomerCreated="LoadCustomersAsync" />
+
+@if (errorMessage is not null)
+{
+    <div class="alert alert-danger">@errorMessage</div>
+}
+
+@if (customers is null)
+{
+    @if (errorMessage is null)
+    {
+        <div>Loading customers...</div>
+    }
+}
+else
+{
+    <CustomerTable Customers="@customers" />
+}
+
+@code {
+    private CustomerResponse[]? customers;
+    private string? errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadCustomersAsync();
+    }
+
+    private async Task LoadCustomersAsync()
+    {
+        try
+        {
+            errorMessage = null;
+            customers = await CustomerApi.GetCustomersAsync();
+        }
+        catch (HttpRequestException)
+        {
+            errorMessage = "Failed to retrieve customers. Please try again later.";
+        }
+    }
+}

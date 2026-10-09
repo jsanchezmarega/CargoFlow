@@ -1,0 +1,29 @@
+﻿@if (Customers.Any())
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var customer in Customers)
+            {
+                <tr>
+                    <td>@customer.Id</td>
+                    <td>@customer.Name</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <div>No customers found.</div>
+}
+
+@code {
+    [Parameter]
+    public IEnumerable<CustomerResponse> Customers { get; set; } = [];
+}

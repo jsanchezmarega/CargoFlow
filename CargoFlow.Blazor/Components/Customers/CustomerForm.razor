@@ -1,0 +1,64 @@
+﻿@using CargoFlow.Blazor.Models
+@using CargoFlow.Blazor.Services
+@inject CustomerApiClient CustomerApi
+
+@if (errorMessage is not null)
+{
+    <div class="alert alert-danger">@errorMessage</div>
+}
+<EditForm FormName="create-customer" Model="@model" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <div class="mb-3" style="width: 220px;">
+        <label for="name" class="form-label">Name</label>
+        <InputText id="name"
+                   class="form-control"
+                   @bind-Value="model.Name"
+                   placeholder="Customer name" />
+        <ValidationMessage For="@(() => model.Name)" class="text-danger"/>
+    </div>
+    <button type="submit"
+            class="btn btn-sm btn-primary"
+            disabled="@isSubmitting">
+        @(isSubmitting ? "Creating..." : "Create Customer")
+    </button>
+</EditForm>
+
+@code {
+    [Parameter]
+    public EventCallback OnCustomerCreated { get; set; }
+    
+    private CreateCustomerModel model = new();
+    private bool isSubmitting;
+    private string? errorMessage;
+
+    private async Task HandleValidSubmit()
+    {
+        if (isSubmitting)
+        {
+            return;
+        }
+
+        isSubmitting = true;
+        errorMessage = null;
+
+        try
+        {
+
+            var request = new CreateCustomerRequest(model.Name.Trim());
+
+            await CustomerApi.CreateCustomerAsync(request);
+
+            model = new CreateCustomerModel();
+
+            await OnCustomerCreated.InvokeAsync();
+        }
+        catch (HttpRequestException)
+        {
+            errorMessage = "Failed to create customer. Please try again.";
+        }
+        finally
+        {
+            isSubmitting = false;
+        }
+    }
+}
