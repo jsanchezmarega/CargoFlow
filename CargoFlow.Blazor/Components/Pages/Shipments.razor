@@ -7,90 +7,114 @@
 
 <PageTitle>Shipments</PageTitle>
 
-<h1>Shipments</h1>
+<h1 class="mb-4">Shipments</h1>
 
-<p>Manage CargoFlow shipments.</p>
+<section class="mb-5">
+    <h3 class="mb-3">Create Shipment</h3>
 
-<div class="d-flex gap-3 mb-3">
-    <div class="mb-3" style="max-width: 220px;">
-        <label for="statusFilter" class="form-label">Status</label>
-        <select id="statusFilter"
-                @bind="selectedStatus"
-                @bind:after="ApplyFiltersAsync"
-                disabled="@isLoadingShipments"
-                class="form-select">
-            <option value="">All</option>
-            <option value="Planned">Planned</option>
-            <option value="InTransit">InTransit</option>
-            <option value="Delivered">Delivered</option>
-            <option value="Cancelled">Cancelled</option>
-        </select>
-    </div>
-
-    <div class="mb-3" style="max-width: 220px;">
-        <label for="customerFilter" class="form-label">Customer</label>
-        <select id="customerFilter"
-                @bind="selectedCustomerId"
-                @bind:after="ApplyFiltersAsync"
-                disabled="@(isLoadingCustomers || isLoadingShipments)"
-                class="form-select">
-            @if (customers is not null && !isLoadingCustomers)
-            {
-                <option value="">All</option>
-                @foreach (var customer in customers)
-                {
-                    <option value="@customer.Id">@customer.Name</option>
-                }
-            }
-            else
-            {
-                <option value="">@(isLoadingCustomers ? "Loading customers..." : "Failed to load customers")</option>
-            }
-        </select>
-        @if (customerErrorMessage is not null)
-        {
-            <div class="text-danger small">@customerErrorMessage</div>
-        }
-    </div>
-
-    <div class="mb-3" style="width: 220px;">
-        <label for="originFilter" class="form-label">Origin</label>
-        <input id="originFilter"
-               type="text"
-               class="form-control"
-               @bind="selectedOrigin"
-               @bind:after="ApplyFiltersAsync"
-               disabled="@isLoadingShipments"
-               placeholder="e.g. Cologne" />
-    </div>
-</div>
-
-@if (errorMessage is not null)
-{
-    <div class="alert alert-danger">@errorMessage</div>
-}
-
-@if (actionErrorMessage is not null)
-{
-    <div class="alert alert-danger">@actionErrorMessage</div>
-}
-
-@if (shipments is null)
-{
-    @if (errorMessage is null)
+    @if (customers is not null)
     {
-        <div>Loading shipments...</div>
+        <ShipmentForm Customers="@customers"
+                      OnShipmentCreated="LoadShipmentsAsync" />
+
+        @if (!customers.Any())
+        {
+            <div class="alert alert-info mt-3">
+                No customers available.
+                <a href="/customers">Create a customer</a> before creating a shipment.
+            </div>
+        }
     }
-}
-else
-{
-    <ShipmentTable
-        Shipments="@shipments"
-        ProcessingShipmentId="@processingShipmentId"
-        OnStartTransit="@StartTransitAsync"
-        OnDeliver="@SetDeliveredAsync"
-        OnCancel="@SetCancelledAsync" />
-}
+</section>
+
+<section class="mb-4">
+    <h3 class="mb-3">Filter Shipments</h3>
+
+    <div class="d-flex gap-3 mb-3">
+        <div class="mb-3" style="max-width: 220px;">
+            <label for="statusFilter" class="form-label">Status</label>
+            <select id="statusFilter"
+                    @bind="selectedStatus"
+                    @bind:after="ApplyFiltersAsync"
+                    disabled="@isLoadingShipments"
+                    class="form-select">
+                <option value="">All</option>
+                <option value="Planned">Planned</option>
+                <option value="InTransit">InTransit</option>
+                <option value="Delivered">Delivered</option>
+                <option value="Cancelled">Cancelled</option>
+            </select>
+        </div>
+
+        <div class="mb-3" style="max-width: 220px;">
+            <label for="customerFilter" class="form-label">Customer</label>
+            <select id="customerFilter"
+                    @bind="selectedCustomerId"
+                    @bind:after="ApplyFiltersAsync"
+                    disabled="@(isLoadingCustomers || isLoadingShipments)"
+                    class="form-select">
+                @if (customers is not null && !isLoadingCustomers)
+                {
+                    <option value="">All</option>
+                    @foreach (var customer in customers)
+                    {
+                        <option value="@customer.Id">@customer.Name</option>
+                    }
+                }
+                else
+                {
+                    <option value="">@(isLoadingCustomers ? "Loading customers..." : "Failed to load customers")</option>
+                }
+            </select>
+            @if (customerErrorMessage is not null)
+            {
+                <div class="text-danger small">@customerErrorMessage</div>
+            }
+        </div>
+
+        <div class="mb-3" style="width: 220px;">
+            <label for="originFilter" class="form-label">Origin</label>
+            <input id="originFilter"
+                   type="text"
+                   class="form-control"
+                   @bind="selectedOrigin"
+                   @bind:after="ApplyFiltersAsync"
+                   disabled="@isLoadingShipments"
+                   placeholder="e.g. Cologne" />
+        </div>
+    </div>
+</section>
+
+<section>
+    <h3 class="mb-3">Shipment List</h3>
+
+    @if (errorMessage is not null)
+    {
+        <div class="alert alert-danger">@errorMessage</div>
+    }
+
+    @if (actionErrorMessage is not null)
+    {
+        <div class="alert alert-danger">@actionErrorMessage</div>
+    }
+
+    @if (shipments is null)
+    {
+        @if (errorMessage is null)
+        {
+            <div>Loading shipments...</div>
+        }
+    }
+    else
+    {
+        <ShipmentTable
+            Shipments="@shipments"
+            ProcessingShipmentId="@processingShipmentId"
+            OnStartTransit="@StartTransitAsync"
+            OnDeliver="@SetDeliveredAsync"
+            OnCancel="@SetCancelledAsync" />
+    }
+</section>
 
 @code {
     private ShipmentResponse[]? shipments;

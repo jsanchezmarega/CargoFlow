@@ -1,0 +1,105 @@
+﻿@using CargoFlow.Blazor.Models
+@using CargoFlow.Blazor.Services
+@inject ShipmentApiClient ShipmentApi
+
+@if (errorMessage is not null)
+{
+    <div class="alert alert-danger">@errorMessage</div>
+}
+
+<EditForm FormName="create-shipment"
+          Model="@model"
+          OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <div class="mb-3" style="width: 220px;">
+        <div class="mb-3" style="max-width: 220px;">
+            <label for="customerId" class="form-label">Customer</label>
+            <InputSelect id="customerId"
+                    @bind-Value="model.CustomerId"
+                    class="form-select">
+                <option value="">Select a customer</option>
+                @foreach (var customer in Customers)
+                {
+                    <option value="@customer.Id">@customer.Name</option>
+                }
+            </InputSelect>
+            <ValidationMessage For="@(() => model.CustomerId)" class="text-danger" />
+        </div>
+        <div class="mb-3" style="max-width: 220px;">
+            <label for="origin" class="form-label">Origin City</label>
+            <InputText id="origin"
+                       class="form-control"
+                       @bind-Value="model.OriginCity"
+                       placeholder="Origin city" />
+            <ValidationMessage For="@(() => model.OriginCity)" class="text-danger" />
+        </div>
+        <div class="mb-3" style="max-width: 220px;">
+            <label for="destination" class="form-label">Destination City</label>
+            <InputText id="destination"
+                       class="form-control"
+                       @bind-Value="model.DestinationCity"
+                       placeholder="Destination city" />
+            <ValidationMessage For="@(() => model.DestinationCity)" class="text-danger" />
+        </div>
+        <div class="mb-3" style="max-width: 220px;">
+            <label for="weight" class="form-label">Weight</label>
+            <InputNumber id="weight"
+                       class="form-control"
+                       @bind-Value="model.Weight"
+                       placeholder="Weight" />
+            <ValidationMessage For="@(() => model.Weight)" class="text-danger" />
+        </div>
+    </div>
+    <button type="submit"
+            class="btn btn-primary"
+            disabled="@(isSubmitting || !Customers.Any())">
+        @(isSubmitting ? "Creating..." : "Create Shipment")
+    </button>
+</EditForm>
+
+@code {
+    [Parameter]
+    public IEnumerable<CustomerResponse> Customers { get; set; } = [];
+    [Parameter]
+    public EventCallback OnShipmentCreated { get; set; }
+
+    private bool isSubmitting;
+    private string? errorMessage;
+
+    private CreateShipmentModel model = new();
+
+    private async Task HandleValidSubmit()
+    {
+        if (isSubmitting)
+        {
+            return;
+        }
+
+        isSubmitting = true;
+        errorMessage = null;
+
+        try
+        {
+            var request = new CreateShipmentRequest(
+                model.CustomerId!.Value,
+                model.OriginCity.Trim(),
+                model.DestinationCity.Trim(),
+                model.Weight!.Value
+            );
+
+            await ShipmentApi.CreateShipmentAsync(request);
+
+            model = new CreateShipmentModel();
+
+            await OnShipmentCreated.InvokeAsync();
+        }
+        catch (HttpRequestException)
+        {
+            errorMessage = "Failed to create shipment. Please try again.";
+        }
+        finally
+        {
+            isSubmitting = false;
+        }
+    }
+}

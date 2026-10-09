@@ -43,4 +43,12 @@ public class ShipmentApiClient(HttpClient httpClient)
 
         return response.StatusCode;
     }
+    public async Task<ShipmentResponse?> CreateShipmentAsync(CreateShipmentRequest request)
+    {
+        using var response = await httpClient.PostAsJsonAsync("api/shipments", request);
+
+        response.EnsureSuccessStatusCode();
+
+        return await response.Content.ReadFromJsonAsync<ShipmentResponse>();
+    }
 }
