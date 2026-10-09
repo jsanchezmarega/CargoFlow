@@ -8,6 +8,7 @@ if "%1"=="build" goto build
 if "%1"=="test" goto test
 if "%1"=="test-core" goto test-core
 if "%1"=="test-api" goto test-api
+if "%1"=="test-blazor" goto test-blazor
 if "%1"=="start" goto start
 if "%1"=="stop" goto stop
 if "%1"=="api" goto api
@@ -116,6 +117,11 @@ exit /b %errorlevel%
 
 :test-api
 dotnet test CargoFlow.Api.Tests\CargoFlow.Api.Tests.csproj
+exit /b %errorlevel%
+
+
+:test-blazor
+dotnet test CargoFlow.Blazor.Tests\CargoFlow.Blazor.Tests.csproj
 exit /b %errorlevel%
 
 
@@ -277,6 +283,7 @@ echo   dev.cmd build
 echo   dev.cmd test
 echo   dev.cmd test-core
 echo   dev.cmd test-api
+echo   dev.cmd test-blazor
 echo   dev.cmd start
 echo   dev.cmd stop
 echo   dev.cmd api
